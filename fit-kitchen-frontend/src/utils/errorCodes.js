@@ -1,4 +1,4 @@
-const ErrorCodes = {
+export const ErrorCodes = {
     // Autentikasi (1xxx)
     INVALID_CREDENTIALS: '1001',
     TOKEN_EXPIRED: '1002',
@@ -33,5 +33,3 @@ const ErrorCodes = {
     INTERNAL_SERVER_ERROR: '9001',
     SERVICE_UNAVAILABLE: '9002'
 };
-
-module.exports = ErrorCodes;

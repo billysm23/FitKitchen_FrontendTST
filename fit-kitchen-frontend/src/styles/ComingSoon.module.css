@@ -1,0 +1,239 @@
+.coming_soon_container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--navbar-bg) 0%, var(--bg-accent) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.background_animation {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.floating_particle {
+    position: absolute;
+    background: var(--secondary-color);
+    opacity: 0.1;
+    border-radius: 50%;
+    animation: float 3s infinite ease-in-out;
+}
+
+.content_wrapper {
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.title {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: bold;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    animation: fadeIn 1s ease-out;
+}
+
+.subtitle {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    color: var(--text-light);
+    opacity: 0.9;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+}
+
+.countdown_grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.countdown_item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.countdown_item:hover {
+    transform: translateY(-5px);
+}
+
+.countdown_number {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.countdown_label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Feature Grid Styles */
+.features_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.feature_card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature_card:hover {
+    transform: translateY(-5px);
+}
+
+.feature_icon {
+    color: var(--secondary-color);
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature_title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.feature_description {
+    color: var(--text-light);
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+/* Footer Actions Styles */
+.footer_actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.social_links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social_link {
+    background: var(--secondary-color);
+    color: var(--black-white);
+    padding: 0.75rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social_link:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.back_button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back_button:hover {
+    color: var(--secondary-color);
+    transform: translateX(-5px);
+}
+
+.back_button svg {
+    transition: transform 0.3s ease;
+}
+
+.back_button:hover svg {
+    transform: translateX(-5px);
+}
+
+/* Animasi */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@media (max-width: 768px) {
+    .countdown_grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .email_wrapper {
+        flex-direction: column;
+    }
+
+    .submit_button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .features_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer_actions {
+        gap: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating_particle,
+    .countdown_item,
+    .submit_button {
+        animation: none;
+        transition: none;
+    }
+}

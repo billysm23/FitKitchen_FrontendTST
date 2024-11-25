@@ -1,50 +1,45 @@
-import axios from 'axios';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { authAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    const handleChange = (e) => {
+        setFormData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        
         try {
-            setLoading(true);
-            const response = await api.post('/api/auth/login', {
-                email,
-                password
-            });
-            
-            if (response.data.success) {
-                const { token, user } = response.data.data;
-                localStorage.setItem('token', token);
-                toast.success('Login successful!');
-                navigate('/');
-            }
+            await login(formData.email, formData.password);
+            navigate('/');
         } catch (error) {
-            console.error('Login error:', error);
-            toast.error(error.response?.data?.error?.message || 'Failed to login');
+            console.error('Login failed:', error);
         } finally {
             setLoading(false);
         }
     };
-  
+
     const handleGoogleSignIn = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/google`);
-        if (response.data.success && response.data.data.url) {
-          window.location.href = response.data.data.url;
+        try {
+            const authUrl = await authAPI.googleSignIn();
+            window.location.href = authUrl;
+        } catch (error) {
+            console.error('Google sign in failed:', error);
         }
-      } catch (error) {
-        console.error('Google sign in error:', error);
-        toast.error('Failed to initialize Google sign in');
-      }
     };
 
     return (
@@ -57,50 +52,44 @@ export default function Login() {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email address
                             </label>
-                            <div className="mt-1">
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
                         </div>
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
-                            <div className="mt-1">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
                         </div>
 
-                        <div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                            >
-                                {loading ? 'Signing in...' : 'Sign in'}
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                            {loading ? 'Signing in...' : 'Sign in'}
+                        </button>
                     </form>
 
                     <div className="mt-6">
@@ -113,15 +102,13 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="mt-6">
-                            <button
-                                onClick={handleGoogleSignIn}
-                                className="w-full flex justify-center items-center gap-2 px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                <img src="/google.svg" alt="Google" className="w-5 h-5" />
-                                Sign in with Google
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleGoogleSignIn}
+                            className="mt-6 w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
+                            Sign in with Google
+                        </button>
                     </div>
 
                     <p className="mt-6 text-center text-sm text-gray-600">

@@ -1,34 +1,33 @@
-import api from './axios';
+import { sessionManager } from '../utils/session.js';
+import api from './axios.js';
 
-export const login = async (credentials) => {
-    try {
-        const response = await api.post('/auth/login', credentials);
-        if (response.token) {
-        localStorage.setItem('token', response.token);
+export const authAPI = {
+    async login(credentials) {
+        const response = await api.post('/api/auth/login', credentials);
+        if (response.success) {
+            sessionManager.setSession(response.data.token, response.data.user);
         }
         return response;
-    } catch (error) {
-        throw error;
-    }
-};
+    },
 
-export const register = async (userData) => {
-    try {
-        const response = await api.post('/auth/register', userData);
-        if (response.token) {
-        localStorage.setItem('token', response.token);
+    async register(userData) {
+        const response = await api.post('/api/auth/register', userData);
+        if (response.success) {
+            sessionManager.setSession(response.data.token, response.data.user);
         }
         return response;
-    } catch (error) {
-        throw error;
-    }
-};
+    },
 
-export const logout = async () => {
-    try {
-        await api.post('/auth/logout');
-        localStorage.removeItem('token');
-    } catch (error) {
-        throw error;
+    async logout() {
+        try {
+            await api.post('/api/auth/logout');
+        } finally {
+            sessionManager.clearSession();
+        }
+    },
+
+    async googleSignIn() {
+        const response = await api.get('/api/auth/google');
+        return response.data.url;
     }
 };

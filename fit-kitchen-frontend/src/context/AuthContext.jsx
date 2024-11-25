@@ -1,12 +1,9 @@
-import axios from 'axios';
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { authAPI } from '../api/auth';
+import { sessionManager } from '../utils/session';
 
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-});
-
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -15,76 +12,66 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Add axios interceptor for token
-  api.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      api.get('/api/auth/verify')
-        .then(response => {
-          if (response.data.success) {
-            setCurrentUser(response.data.user);
-          }
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    initializeAuth();
   }, []);
 
+  const initializeAuth = async () => {
+    try {
+      const session = sessionManager.getSession();
+      if (session?.user) {
+        setCurrentUser(session.user);
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+    } finally {
+      setInitialized(true);
+      setLoading(false);
+    }
+  };
+
   const login = async (email, password) => {
-    const response = await api.post('/api/auth/login', {
-      email,
-      password
-    });
-    
-    if (response.data.success) {
-      const { token, user } = response.data.data;
-      localStorage.setItem('token', token);
-      setCurrentUser(user);
-      return user;
+    try {
+      setLoading(true);
+      const response = await authAPI.login({ email, password });
+      setCurrentUser(response.data.user);
+      toast.success('Successfully logged in!');
+      return response;
+    } catch (error) {
+      toast.error(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (username, email, password) => {
-    const response = await api.post('/api/auth/register', {
-      username,
-      email,
-      password
-    });
-    
-    if (response.data.success) {
-      const { token, user } = response.data.data;
-      localStorage.setItem('token', token);
-      setCurrentUser(user);
-      return user;
+    try {
+      setLoading(true);
+      const response = await authAPI.register({ username, email, password });
+      setCurrentUser(response.data.user);
+      toast.success('Successfully registered!');
+      return response;
+    } catch (error) {
+      toast.error(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      await api.post('/api/auth/logout');
-    } finally {
-      localStorage.removeItem('token');
+      setLoading(true);
+      await authAPI.logout();
       setCurrentUser(null);
+      toast.success('Successfully logged out');
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,12 +80,17 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    loading
+    loading,
+    initialized
   };
+
+  if (!initialized) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }
