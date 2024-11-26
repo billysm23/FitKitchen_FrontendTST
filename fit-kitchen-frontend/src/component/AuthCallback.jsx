@@ -1,50 +1,46 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 export default function AuthCallback() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login } = useAuth();
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                // Debug log
-                console.log('Current URL:', window.location.href);
-                console.log('Search params:', location.search);
-                console.log('Hash params:', location.hash);
-
-                const searchParams = new URLSearchParams(location.search);
                 const hashParams = new URLSearchParams(location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                const error = hashParams.get('error');
 
-                const code = searchParams.get('code') || hashParams.get('code');
-                const error = searchParams.get('error') || hashParams.get('error');
-                
-                console.log('All search parameters:', Object.fromEntries(searchParams.entries()));
-                console.log('All hash parameters:', Object.fromEntries(hashParams.entries()));
+                console.log('Hash parameters:', {
+                    accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : null,
+                    error
+                });
 
                 if (error) {
-                    throw new Error(`Google OAuth error: ${error}`);
+                    throw new Error(`Authentication error: ${error}`);
                 }
 
-                if (!code) {
-                    throw new Error('No authorization code received from Google');
+                if (!accessToken) {
+                    throw new Error('No access token received');
                 }
 
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/callback?code=${code}`, {
-                    method: 'GET',
+                // Kirim access token ke backend
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/callback`, {
+                    method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
+                    body: JSON.stringify({ access_token: accessToken }),
                     credentials: 'include'
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to authenticate');
+                    throw new Error(errorData.error?.message || 'Failed to authenticate');
                 }
 
                 const data = await response.json();
@@ -57,23 +53,16 @@ export default function AuthCallback() {
                 if (data.data?.token && data.data?.user) {
                     sessionStorage.setItem('token', data.data.token);
                     sessionStorage.setItem('user', JSON.stringify(data.data.user));
-                    
-                    toast.success('Successfully logged in!');
-                    
-                    // Navigate ke home
+                    toast.success('Successfully logged in with Google!');
                     navigate('/', { replace: true });
                 } else {
                     throw new Error('Invalid response from server');
                 }
+
             } catch (error) {
                 console.error('Auth callback error:', error);
                 setError(error.message);
                 toast.error(error.message);
-                
-                // Log debug info
-                console.log('Environment:', process.env.NODE_ENV);
-                console.log('API URL:', process.env.REACT_APP_API_URL);
-                
                 setTimeout(() => navigate('/login'), 3000);
             }
         };
@@ -81,9 +70,9 @@ export default function AuthCallback() {
         handleCallback();
     }, [navigate, location]);
 
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            {error ? (
                 <div className="max-w-md w-full p-6">
                     <div className="bg-white shadow-lg rounded-lg p-6">
                         <div className="flex items-center justify-center text-red-600 mb-4">
@@ -100,16 +89,12 @@ export default function AuthCallback() {
                         </p>
                     </div>
                 </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Completing authentication...</p>
-            </div>
+            ) : (
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Completing authentication...</p>
+                </div>
+            )}
         </div>
     );
 }

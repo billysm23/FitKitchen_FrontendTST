@@ -35,8 +35,19 @@ export default function Login() {
 
     const handleGoogleSignIn = async () => {
         try {
+            // Get the current origin
+            const origin = window.location.origin;
+            const callbackUrl = `${origin}/auth/callback`;
+            
+            // Log untuk debugging
+            console.log('Callback URL:', callbackUrl);
+            
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
                 method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Origin': origin
+                },
                 credentials: 'include'
             });
             
@@ -46,8 +57,9 @@ export default function Login() {
                 throw new Error('Failed to get Google authentication URL');
             }
             
-            console.log('Redirecting to Google OAuth:', data.data.url);
+            console.log('Redirecting to:', data.data.url);
             window.location.href = data.data.url;
+            
         } catch (error) {
             console.error('Google sign in error:', error);
             toast.error('Failed to initialize Google sign in');
