@@ -29,7 +29,7 @@ export default function Layout({ children }) {
                                     <div className="flex flex-shrink-0 items-center">
                                         <img
                                             className="h-8 w-auto"
-                                            src="/logo.svg"
+                                            src="/../../../icon.png"
                                             alt="FitKitchen"
                                         />
                                     </div>
