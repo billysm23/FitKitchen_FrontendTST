@@ -1,5 +1,6 @@
 import { Toaster } from 'react-hot-toast';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import AuthCallback from './component/AuthCallback.jsx';
 import Layout from './component/Layout.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import About from './pages/About.jsx';
@@ -102,6 +103,14 @@ function App() {
                                     <Home />
                                 </Layout>
                             </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Oauth Callback Routes */}
+                    <Route
+                        path="/auth/callback"
+                        element={
+                            <AuthCallback />
                         }
                     />
 
