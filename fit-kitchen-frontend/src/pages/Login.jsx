@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -35,10 +35,22 @@ export default function Login() {
 
     const handleGoogleSignIn = async () => {
         try {
-            const authUrl = await authAPI.googleSignIn();
-            window.location.href = authUrl;
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.data?.url) {
+                throw new Error('Failed to get Google authentication URL');
+            }
+            
+            console.log('Redirecting to Google OAuth:', data.data.url);
+            window.location.href = data.data.url;
         } catch (error) {
-            console.error('Google sign in failed:', error);
+            console.error('Google sign in error:', error);
+            toast.error('Failed to initialize Google sign in');
         }
     };
 
