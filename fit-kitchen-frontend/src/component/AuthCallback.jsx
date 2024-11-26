@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function AuthCallback() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { updateAuthState } = useAuth();
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -12,36 +14,21 @@ export default function AuthCallback() {
             try {
                 const hashParams = new URLSearchParams(location.hash.substring(1));
                 const accessToken = hashParams.get('access_token');
-                const error = hashParams.get('error');
 
-                console.log('Hash parameters:', {
-                    accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : null,
-                    error
-                });
-
-                if (error) {
-                    throw new Error(`Authentication error: ${error}`);
-                }
+                console.log('Processing callback with access token:', accessToken ? 'present' : 'missing');
 
                 if (!accessToken) {
                     throw new Error('No access token received');
                 }
 
-                // Kirim access token ke backend
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/callback`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ access_token: accessToken }),
                     credentials: 'include'
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || 'Failed to authenticate');
-                }
 
                 const data = await response.json();
 
@@ -49,10 +36,9 @@ export default function AuthCallback() {
                     throw new Error(data.error?.message || 'Authentication failed');
                 }
 
-                // Set session
+                // Set session dan update auth context
                 if (data.data?.token && data.data?.user) {
-                    sessionStorage.setItem('token', data.data.token);
-                    sessionStorage.setItem('user', JSON.stringify(data.data.user));
+                    updateAuthState(data.data.user, data.data.token);
                     toast.success('Successfully logged in with Google!');
                     navigate('/', { replace: true });
                 } else {
@@ -68,7 +54,7 @@ export default function AuthCallback() {
         };
 
         handleCallback();
-    }, [navigate, location]);
+    }, [navigate, location, updateAuthState]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
