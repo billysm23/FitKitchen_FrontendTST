@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
@@ -21,81 +20,15 @@ export default function Register() {
         }));
     };
 
-    const validateForm = () => {
-        // Username validation
-        if (!formData.username) {
-            toast.error('Username is required');
-            return false;
-        }
-        if (formData.username.length < 6 || formData.username.length > 30) {
-            toast.error('Username must be between 6 and 30 characters');
-            return false;
-        }
-        const usernameRegex = /^[a-zA-Z0-9._-]+$/;
-        if (!usernameRegex.test(formData.username)) {
-            toast.error('Username can only contain letters, numbers, dots, underscores, and hyphens');
-            return false;
-        }
-
-        // Email validation
-        if (!formData.email) {
-            toast.error('Email is required');
-            return false;
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.email)) {
-            toast.error('Please enter a valid email address');
-            return false;
-        }
-
-        // Password validation
-        if (!formData.password) {
-            toast.error('Password is required');
-            return false;
-        }
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-        if (!passwordRegex.test(formData.password)) {
-            toast.error('Password must be at least 6 characters and include uppercase, lowercase, number, and special character');
-            return false;
-        }
-
-        return true;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        if (!validateForm()) {
-            return;
-        }
-
         setLoading(true);
         
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error?.message || 'Registration failed');
-            }
-
-            if (data.data?.token && data.data?.user) {
-                await register(data.data.user, data.data.token);
-                toast.success('Registration successful!');
-                navigate('/');
-            }
-
+            await register(formData.username, formData.email, formData.password);
+            navigate('/');
         } catch (error) {
-            console.error('Registration error:', error);
-            toast.error(error.message || 'Registration failed. Please try again.');
+            console.error('Registration failed:', error);
         } finally {
             setLoading(false);
         }
@@ -103,10 +36,31 @@ export default function Register() {
 
     const handleGoogleSignIn = async () => {
         try {
-            const authUrl = await authAPI.googleSignIn();
-            window.location.href = authUrl;
+            const origin = window.location.origin;
+            const callbackUrl = `${origin}/auth/callback`;
+            
+            console.log('Callback URL:', callbackUrl);
+            
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Origin': origin
+                },
+                credentials: 'include'
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.data?.url) {
+                throw new Error('Failed to get Google authentication URL');
+            }
+            
+            console.log('Redirecting to:', data.data.url);
+            window.location.href = data.data.url;
+            
         } catch (error) {
-            console.error('Google sign in failed:', error);
+            console.error('Google sign in error:', error);
             toast.error('Failed to initialize Google sign in');
         }
     };

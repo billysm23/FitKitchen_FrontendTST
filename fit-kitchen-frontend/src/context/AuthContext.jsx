@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
         }
     };
     
-    const register = async (email, password) => {
+    const register = async (username, email, password) => {
         try {
             setLoading(true);
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ username, email, password }),
                 credentials: 'include'
             });
 
