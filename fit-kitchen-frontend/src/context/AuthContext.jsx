@@ -63,6 +63,36 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     };
+    
+    const register = async (email, password) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error?.message || 'Registration failed');
+            }
+
+            updateAuthState(data.data.user, data.data.token);
+            toast.success('Registration successful!');
+            
+            return data;
+        } catch (error) {
+            toast.error(error.message);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const logout = async () => {
         try {
@@ -89,6 +119,7 @@ export function AuthProvider({ children }) {
     const value = {
         currentUser,
         login,
+        register,
         logout,
         loading,
         updateAuthState

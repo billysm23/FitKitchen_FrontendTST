@@ -9,20 +9,14 @@ const About = () => {
                 <div className={styles.about_header}>
                     <h1 className={styles.title}>About CT Lab</h1>
                     <p className={styles.description}>
-                        CT Lab is an innovative virtual laboratory designed to enhance your
-                        understanding of Computational Thinking through interactive learning
-                        experiences. Our platform provides accessible, engaging, and effective
-                        tools for learning computational thinking concepts, preparing students
-                        for the challenges of tomorrow's digital world.
+                        FitKitchen is.......
                     </p>
                 </div>
 
                 <section className={styles.mission}>
                     <h2>Our Mission</h2>
                     <p>
-                        To provide accessible, engaging, and effective tools for learning
-                        computational thinking concepts, preparing students for the challenges
-                        of tomorrow's digital world.
+                        To.......
                     </p>
                 </section>
 
@@ -67,11 +61,6 @@ const About = () => {
                                     src="/images/Billy.jpg"
                                     alt="Developer Profile"
                                     className={styles.profile_image}
-                                />
-                                <img
-                                    src="/images/bayibiksu.jpeg"
-                                    alt="Baby Profile"
-                                    className={styles.baby_image}
                                 />
                             </div>
                         </div>

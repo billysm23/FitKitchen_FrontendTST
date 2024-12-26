@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
@@ -20,15 +21,81 @@ export default function Register() {
         }));
     };
 
+    const validateForm = () => {
+        // Username validation
+        if (!formData.username) {
+            toast.error('Username is required');
+            return false;
+        }
+        if (formData.username.length < 6 || formData.username.length > 30) {
+            toast.error('Username must be between 6 and 30 characters');
+            return false;
+        }
+        const usernameRegex = /^[a-zA-Z0-9._-]+$/;
+        if (!usernameRegex.test(formData.username)) {
+            toast.error('Username can only contain letters, numbers, dots, underscores, and hyphens');
+            return false;
+        }
+
+        // Email validation
+        if (!formData.email) {
+            toast.error('Email is required');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            toast.error('Please enter a valid email address');
+            return false;
+        }
+
+        // Password validation
+        if (!formData.password) {
+            toast.error('Password is required');
+            return false;
+        }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        if (!passwordRegex.test(formData.password)) {
+            toast.error('Password must be at least 6 characters and include uppercase, lowercase, number, and special character');
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
         setLoading(true);
         
         try {
-            await register(formData.username, formData.email, formData.password);
-            navigate('/');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error?.message || 'Registration failed');
+            }
+
+            if (data.data?.token && data.data?.user) {
+                await register(data.data.user, data.data.token);
+                toast.success('Registration successful!');
+                navigate('/');
+            }
+
         } catch (error) {
-            console.error('Registration failed:', error);
+            console.error('Registration error:', error);
+            toast.error(error.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -40,6 +107,7 @@ export default function Register() {
             window.location.href = authUrl;
         } catch (error) {
             console.error('Google sign in failed:', error);
+            toast.error('Failed to initialize Google sign in');
         }
     };
 
@@ -67,8 +135,6 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="Enter your username"
-                                minLength={6}
-                                maxLength={30}
                             />
                             <p className="mt-1 text-xs text-gray-500">
                                 Username must be between 6 and 30 characters
@@ -104,7 +170,6 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="••••••••"
-                                minLength={6}
                             />
                             <p className="mt-1 text-xs text-gray-500">
                                 Password must be at least 6 characters and include uppercase, lowercase, number, and special character
@@ -141,33 +206,10 @@ export default function Register() {
 
                     <p className="mt-6 text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link
-                            to="/login"
-                            className="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150"
-                        >
+                        <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
                             Sign in here
                         </Link>
                     </p>
-
-                    <div className="mt-6">
-                        <div className="rounded-md bg-blue-50 p-4">
-                            <div className="flex">
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-blue-800">
-                                        Why create an account?
-                                    </h3>
-                                    <div className="mt-2 text-sm text-blue-700">
-                                        <ul className="list-disc pl-5 space-y-1">
-                                            <li>Get personalized meal recommendations</li>
-                                            <li>Track your dietary progress</li>
-                                            <li>Save your favorite meals</li>
-                                            <li>Receive exclusive offers and updates</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
