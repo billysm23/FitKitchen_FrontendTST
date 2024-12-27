@@ -1,27 +1,99 @@
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/Register.css';
 
 export default function Register() {
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        password: ''
+        password: '',
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { register } = useAuth();
 
+    const validatePassword = (password) => {
+        const requirements = {
+            length: password.length >= 6,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[@$!%*?&]/.test(password),
+        };
+
+        return {
+            isValid: Object.values(requirements).every(Boolean),
+            requirements
+        };
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // Username validation
+        if (!formData.username) {
+            newErrors.username = 'Username is required';
+        } else if (formData.username.length < 6 || formData.username.length > 30) {
+            newErrors.username = 'Username must be between 6 and 30 characters';
+        } else if (!/^[a-zA-Z0-9._-]+$/.test(formData.username)) {
+            newErrors.username = 'Username can only contain letters, numbers, dots, underscores, and hyphens';
+        }
+
+        // Email validation
+        if (!formData.email) {
+            newErrors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email';
+        }
+
+        // Password validation
+        const { isValid, requirements } = validatePassword(formData.password);
+        if (!isValid) {
+            newErrors.password = 'Password does not meet requirements';
+            newErrors.passwordRequirements = requirements;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const getPasswordStrength = (password) => {
+        const { requirements } = validatePassword(password);
+        const validCount = Object.values(requirements).filter(Boolean).length;
+        
+        if (validCount <= 2) return 'weak';
+        if (validCount <= 4) return 'medium';
+        return 'strong';
+    };
+
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [name]: value
         }));
+        
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
         setLoading(true);
         
         try {
@@ -29,6 +101,9 @@ export default function Register() {
             navigate('/');
         } catch (error) {
             console.error('Registration failed:', error);
+            setErrors({
+                submit: error.message || 'Registration failed. Please try again.'
+            });
         } finally {
             setLoading(false);
         }
@@ -38,8 +113,6 @@ export default function Register() {
         try {
             const origin = window.location.origin;
             const callbackUrl = `${origin}/auth/callback`;
-            
-            console.log('Callback URL:', callbackUrl);
             
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
                 method: 'GET',
@@ -56,9 +129,7 @@ export default function Register() {
                 throw new Error('Failed to get Google authentication URL');
             }
             
-            console.log('Redirecting to:', data.data.url);
             window.location.href = data.data.url;
-            
         } catch (error) {
             console.error('Google sign in error:', error);
             toast.error('Failed to initialize Google sign in');
@@ -66,104 +137,135 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Create your account
-                </h2>
-            </div>
+        <div className="auth-page">
+            <div className="auth-box">
+                {loading && (
+                    <div className="loading-overlay">
+                        <div className="loading-spinner"></div>
+                    </div>
+                )}
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                                Username
-                            </label>
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                required
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="Enter your username"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">
-                                Username must be between 6 and 30 characters
-                            </p>
-                        </div>
+                <h2 className="auth-title">Create your account</h2>
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="you@example.com"
-                            />
-                        </div>
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="username" className="form-label">
+                            Username
+                        </label>
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className={`form-input ${errors.username ? 'error' : ''}`}
+                            placeholder="Enter your username"
+                        />
+                        {errors.username && <div className="error-message">{errors.username}</div>}
+                    </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
+                    <div className="form-group">
+                        <label htmlFor="email" className="form-label">
+                            Email address
+                        </label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={`form-input ${errors.email ? 'error' : ''}`}
+                            placeholder="you@example.com"
+                        />
+                        {errors.email && <div className="error-message">{errors.email}</div>}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password" className="form-label">
+                            Password
+                        </label>
+                        <div className="input-group">
                             <input
                                 id="password"
                                 name="password"
-                                type="password"
-                                required
+                                type={showPassword ? 'text' : 'password'}
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                className={`form-input ${errors.password ? 'error' : ''}`}
                                 placeholder="••••••••"
                             />
-                            <p className="mt-1 text-xs text-gray-500">
-                                Password must be at least 6 characters and include uppercase, lowercase, number, and special character
-                            </p>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            {loading ? 'Creating account...' : 'Create account'}
-                        </button>
-                    </form>
-
-                    <div className="mt-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300" />
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                            <div 
+                                className="input-icon"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </div>
                         </div>
+                        
+                        {formData.password && (
+                            <div className="strength-indicator">
+                                <div className={`strength-bar strength-${getPasswordStrength(formData.password)}`} />
+                            </div>
+                        )}
 
-                        <button
-                            onClick={handleGoogleSignIn}
-                            className="mt-6 w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        >
-                            <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
-                            Sign up with Google
-                        </button>
+                        <ul className="requirements-list">
+                            <li className={`requirement-item ${formData.password.length >= 6 ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
+                                At least 6 characters
+                            </li>
+                            <li className={`requirement-item ${/[A-Z]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
+                                One uppercase letter
+                            </li>
+                            <li className={`requirement-item ${/[a-z]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
+                                One lowercase letter
+                            </li>
+                            <li className={`requirement-item ${/\d/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
+                                One number
+                            </li>
+                            <li className={`requirement-item ${/[@$!%*?&]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
+                                One special character (@$!%*?&)
+                            </li>
+                        </ul>
                     </div>
 
-                    <p className="mt-6 text-center text-sm text-gray-600">
-                        Already have an account?{' '}
-                        <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-                            Sign in here
-                        </Link>
-                    </p>
+                    {errors.submit && <div className="error-message">{errors.submit}</div>}
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="submit-button"
+                    >
+                        {loading ? 'Creating account...' : 'Create account'}
+                    </button>
+                </form>
+
+                <div className="separator">
+                    <div className="separator-line"></div>
+                    <span className="separator-text">Or continue with</span>
+                    <div className="separator-line"></div>
+                </div>
+
+                <button
+                    onClick={handleGoogleSignIn}
+                    className="social-button"
+                >
+                    <img src="/google.svg" alt="Google" className="social-icon" />
+                    Sign up with Google
+                </button>
+
+                <p className="terms-text">
+                    By signing up, you agree to our{' '}
+                    <Link to="/terms" className="terms-link">Terms of Service</Link>
+                    {' '}and{' '}
+                    <Link to="/privacy" className="terms-link">Privacy Policy</Link>
+                </p>
+
+                <div className="auth-link-container">
+                    <span className="auth-link-text">
+                        Already have an account?
+                    </span>
+                    <Link to="/login" className="auth-link">
+                        Sign in here
+                    </Link>
                 </div>
             </div>
         </div>
