@@ -5,6 +5,7 @@ import Layout from './component/Layout.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import About from './pages/About.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
+import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -98,6 +99,15 @@ function App() {
                                 <Layout>
                                     <Home />
                                 </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/health-assessment"
+                        element={
+                            <ProtectedRoute>
+                                <HealthAssessment />
                             </ProtectedRoute>
                         }
                     />

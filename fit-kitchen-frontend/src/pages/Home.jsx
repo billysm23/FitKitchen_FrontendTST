@@ -51,7 +51,7 @@ export default function Home() {
                 <p className="feature-description">
                   Complete your health assessment to receive tailored meal plans.
                 </p>
-                <Link to="/assessment" className="feature-button button-green">
+                <Link to="/health-assessment" className="feature-button button-green">
                   Start Assessment
                 </Link>
               </div>
@@ -109,7 +109,7 @@ export default function Home() {
             Join FitKitchen today to receive personalized meal plans tailored to your health goals.
           </p>
           <div className="auth-buttons">
-            <Link to="/register" className="feature-button button-blue">
+            <Link to="/register" className="feature-button button-green">
               Sign up
             </Link>
             <Link to="/login" className="feature-button button-outline">

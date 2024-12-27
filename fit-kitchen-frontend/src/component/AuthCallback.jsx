@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import styles from '../styles/Auth.module.css';
 
 export default function AuthCallback() {
     const navigate = useNavigate();
@@ -36,7 +37,6 @@ export default function AuthCallback() {
                     throw new Error(data.error?.message || 'Authentication failed');
                 }
 
-                // Set session dan update auth context
                 if (data.data?.token && data.data?.user) {
                     updateAuthState(data.data.user, data.data.token);
                     toast.success('Successfully logged in with Google!');
@@ -57,28 +57,38 @@ export default function AuthCallback() {
     }, [navigate, location, updateAuthState]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className={styles.auth_callback_container}>
             {error ? (
-                <div className="max-w-md w-full p-6">
-                    <div className="bg-white shadow-lg rounded-lg p-6">
-                        <div className="flex items-center justify-center text-red-600 mb-4">
-                            <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className={styles.auth_callback_wrapper}>
+                    <div className={`${styles.error_card} ${styles['fade-in']}`}>
+                        <div className={styles.error_icon_container}>
+                            <svg 
+                                className={styles.error_icon} 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth={2} 
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                                />
                             </svg>
                         </div>
-                        <h3 className="text-xl font-medium text-center text-gray-900 mb-2">
+                        <h3 className={styles.error_title}>
                             Authentication Error
                         </h3>
-                        <p className="text-gray-600 text-center mb-4">{error}</p>
-                        <p className="text-sm text-gray-500 text-center">
+                        <p className={styles.error_message}>{error}</p>
+                        <p className={styles.redirect_message}>
                             Redirecting to login page...
                         </p>
                     </div>
                 </div>
             ) : (
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Completing authentication...</p>
+                <div className={`${styles.loading_container} ${styles['fade-in']}`}>
+                    <div className={styles.loading_spinner}></div>
+                    <p className={styles.loading_text}>Completing authentication...</p>
                 </div>
             )}
         </div>

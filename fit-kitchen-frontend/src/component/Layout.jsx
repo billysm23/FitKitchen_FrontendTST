@@ -12,7 +12,6 @@ export default function Layout({ children }) {
     const navigation = [
         { name: 'Home', href: '/', current: location.pathname === '/' },
         { name: 'About', href: '/about', current: location.pathname === '/about' },
-        { name: 'Coming Soon', href: '/coming-soon', current: location.pathname === '/coming-soon' },
     ];
 
     return (
