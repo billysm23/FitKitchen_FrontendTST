@@ -7,7 +7,7 @@ const About = () => {
         <div className={styles.about}>
             <div className={styles.about_container}>
                 <div className={styles.about_header}>
-                    <h1 className={styles.title}>About CT Lab</h1>
+                    <h1 className={styles.title}>About FitKitchen</h1>
                     <p className={styles.description}>
                         FitKitchen is.......
                     </p>

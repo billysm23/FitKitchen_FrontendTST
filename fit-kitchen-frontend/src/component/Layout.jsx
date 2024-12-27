@@ -63,7 +63,7 @@ export default function Layout({ children }) {
                                 </div>
                             ) : (
                                 <Link to="/login" className="login-button">
-                                    Sign in
+                                    Get Started
                                 </Link>
                             )}
 
