@@ -71,7 +71,7 @@ export default function Login() {
     const handleGoogleSignIn = async () => {
         try {
             const origin = window.location.origin;
-            const callbackUrl = `${origin}/auth/callback`;
+            // const callbackUrl = `${origin}/auth/callback`;
             
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
                 method: 'GET',
