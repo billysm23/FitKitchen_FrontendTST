@@ -1,0 +1,231 @@
+.profile-container {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.profile-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 0;
+}
+
+.edit-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #22c55e;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+    background-color: #16a34a;
+}
+
+.section {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.section-icon {
+    color: #22c55e;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.info-item {
+    margin-bottom: 8px;
+}
+
+.info-label {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.health-history {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.macro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.macro-card {
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.macro-card.protein {
+    background-color: #f0fdf4;
+}
+
+.macro-card.carbs {
+    background-color: #eff6ff;
+}
+
+.macro-card.fats {
+    background-color: #fefce8;
+}
+
+.macro-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.macro-card.protein .macro-label {
+    color: #16a34a;
+}
+
+.macro-card.carbs .macro-label {
+    color: #2563eb;
+}
+
+.macro-card.fats .macro-label {
+    color: #ca8a04;
+}
+
+.macro-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.macro-percentage {
+    font-size: 14px;
+    color: #6b7280;
+    margin-left: 4px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.empty-message {
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.assessment-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #22c55e;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.assessment-button:hover {
+    background-color: #16a34a;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #22c55e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 16px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .macro-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .edit-button {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -386,9 +386,9 @@ const HealthAssessment = () => {
                                     onChange={handleInputChange}
                                     className={styles.form_select}
                                 >
-                                    <option value="moderate_carb">Balanced (30% Protein / 35% Fats / 35% Carbs)</option>
-                                    <option value="lower_carb">Low Carb (40% Protein / 40% Fats / 20% Carbs)</option>
-                                    <option value="higher_carb">High Carb (30% Protein / 20% Fats / 50% Carbs)</option>
+                                    <option value="moderate_carb">Balanced</option>
+                                    <option value="lower_carb">Low Carb</option>
+                                    <option value="higher_carb">High Carb</option>
                                 </select>
                                 <small className={styles.form_helper}>
                                     Choose your preferred macronutrient distribution.<br></br>

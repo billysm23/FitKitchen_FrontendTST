@@ -8,6 +8,7 @@ import ComingSoon from './pages/ComingSoon.jsx';
 import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
+import Profile from './pages/Profile.jsx';
 import Register from './pages/Register.jsx';
 
 // Protected Route Component
@@ -108,6 +109,17 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <HealthAssessment />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <Profile />
+                                </Layout>
                             </ProtectedRoute>
                         }
                     />
