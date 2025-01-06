@@ -6,7 +6,6 @@ import { sessionManager } from '../utils/session';
 
 const HealthAssessment = () => {
     const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(1);
     const initialFormState = {
         // Measurement Data
         height: '',
@@ -15,23 +14,51 @@ const HealthAssessment = () => {
         gender: '',
         
         // Health History
-        healthHistory: {
+        health_history: {
             allergies: [],
-            intolerances: [],
-            familyHistory: [],
+            medicalConditions: [],
             medications: ''
         },
+        macro_ratio: 'moderate_carb',
         
         // Physical Activity & Goals
-        activityLevel: '',
-        exerciseFrequency: '',
-        healthGoals: [],
-        specificGoals: '',
-        targetWeight: ''
+        activity_level: '',
+        health_goal: [],
+        specific_goals: '',
+        target_weight: ''
+    };
+    
+    const [otherAllergy, setOtherAllergy] = useState('');
+    const [otherMedicalCondition, setOtherMedicalCondition] = useState('');
+
+    const handleAddOtherAllergy = () => {
+        if (otherAllergy.trim()) {
+            setFormData(prev => ({
+                ...prev,
+                health_history: {
+                    ...prev.health_history,
+                    allergies: [...prev.health_history.allergies.filter(a => a !== 'Other'), otherAllergy.trim()]
+                }
+            }));
+            setOtherAllergy('');
+        }
+    };
+    
+    const handleAddOtherMedicalCondition = () => {
+        if (otherMedicalCondition.trim()) {
+            setFormData(prev => ({
+                ...prev,
+                health_history: {
+                    ...prev.health_history,
+                    medicalConditions: [...prev.health_history.medicalConditions.filter(m => m !== 'Other'), otherMedicalCondition.trim()]
+                }
+            }));
+            setOtherMedicalCondition('');
+        }
     };
 
     const [formData, setFormData] = useState(initialFormState);
-
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -39,37 +66,37 @@ const HealthAssessment = () => {
             [name]: value
         }));
     };
-
-    const handleHealthHistoryCheckbox = (category, value) => {
+    
+    const handleHealth_historyCheckbox = (category, value) => {
         setFormData(prev => {
-            const currentArray = prev.healthHistory[category] || [];
+            const currentArray = prev.health_history[category] || [];
             const newArray = currentArray.includes(value)
-                ? currentArray.filter(item => item !== value)
-                : [...currentArray, value];
+            ? currentArray.filter(item => item !== value)
+            : [...currentArray, value];
             
             return {
                 ...prev,
-                healthHistory: {
-                    ...prev.healthHistory,
+                health_history: {
+                    ...prev.health_history,
                     [category]: newArray
                 }
             };
         });
     };
-
-    const handleHealthHistoryChange = (e) => {
+    
+    const handleHealth_historyChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            healthHistory: {
-                ...prev.healthHistory,
+            health_history: {
+                ...prev.health_history,
                 [name]: value
             }
         }));
     };
-
-    const renderHealthHistoryCheckboxGroup = (category, options, label) => {
-        const selectedValues = formData.healthHistory[category] || [];
+    
+    const renderHealth_historyCheckboxGroup = (category, options, label) => {
+        const selectedValues = formData.health_history[category] || [];
         
         return (
             <div className={styles.form_group}>
@@ -80,13 +107,13 @@ const HealthAssessment = () => {
                             <input
                                 type="checkbox"
                                 checked={selectedValues.includes(option)}
-                                onChange={() => handleHealthHistoryCheckbox(category, option)}
+                                onChange={() => handleHealth_historyCheckbox(category, option)}
                                 id={`${category}-${option}`}
-                            />
+                                />
                             <label 
                                 htmlFor={`${category}-${option}`}
                                 className={styles.checkbox_label}
-                            >
+                                >
                                 {option}
                             </label>
                         </div>
@@ -95,7 +122,8 @@ const HealthAssessment = () => {
             </div>
         );
     };
-
+    
+    const [currentStep, setCurrentStep] = useState(1);
     const validateStep = (step) => {
         switch (step) {
             case 1:
@@ -104,23 +132,23 @@ const HealthAssessment = () => {
                     return false;
                 }
                 return true;
-            case 2:
-                if (!formData.healthHistory.medications) {
-                    toast.error('Please complete health history information');
-                    return false;
-                }
-                return true;
-            case 3:
-                if (!formData.activityLevel || !formData.exerciseFrequency || formData.healthGoals.length === 0) {
-                    toast.error('Please complete activity and goals information');
-                    return false;
-                }
-                return true;
+                case 2:
+                    if (!formData.health_history.medications) {
+                        toast.error('Please complete health history information');
+                        return false;
+                    }
+                    return true;
+                    case 3:
+                        if (!formData.activity_level || !formData.health_goal || formData.target_weight < 30) {
+                            toast.error('Please complete activity and goals information');
+                            return false;
+                        }
+                        return true;
             default:
                 return true;
-        }
-    };
-
+            }
+        };
+        
     const handleNext = () => {
         if (validateStep(currentStep)) {
             setCurrentStep(prev => prev + 1);
@@ -188,7 +216,7 @@ const HealthAssessment = () => {
 
             <div className={styles.progress_bar}>
                 <div 
-                    className={styles.progress_fill} 
+                    className={styles.progress_fill}
                     style={{ width: `${(currentStep / 3) * 100}%` }}
                 />
             </div>
@@ -279,33 +307,98 @@ const HealthAssessment = () => {
                         <div className={styles.form_section}>
                             <h2 className={styles.section_title}>Health History</h2>
                             
-                            {renderHealthHistoryCheckboxGroup(
+                            {renderHealth_historyCheckboxGroup(
                                 'allergies',
-                                ['Milk', 'Eggs', 'Nuts', 'Seafood', 'Gluten', 'Soy'],
-                                'Food Allergies'
+                                ['Dairy & Dairy Products','Eggs','Nuts','Seafood','Other'],
+                                'Food Allergies/Intolerances'
                             )}
-                            
-                            {renderHealthHistoryCheckboxGroup(
-                                'intolerances',
-                                ['Lactose', 'Fructose', 'Gluten', 'MSG'],
-                                'Food Intolerances'
+
+                            {formData.health_history.allergies.includes('Other') && (
+                                <div className={styles.form_group}>
+                                    <div className={styles.input_group}>
+                                        <input
+                                            type="text"
+                                            value={otherAllergy}
+                                            onChange={(e) => setOtherAllergy(e.target.value)}
+                                            className={styles.form_input}
+                                            placeholder="Enter other allergy/intolerance"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddOtherAllergy}
+                                            className={styles.add_button}
+                                        >
+                                            Add
+                                        </button>
+                                        <small className={styles.form_helper}>
+                                            When you press the 'Add' button, your text will be added directly to database
+                                        </small>
+                                    </div>
+                                </div>
                             )}
-                            
-                            {renderHealthHistoryCheckboxGroup(
-                                'familyHistory',
-                                ['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol'],
-                                'Family Medical History'
+
+                            {renderHealth_historyCheckboxGroup(
+                                'medicalConditions',
+                                ['Diabetes','Hypertension','Acid Reflux (GERD)','High Cholesterol','Other'],
+                                'Medical Conditions'
+                            )}
+
+                            {formData.health_history.medicalConditions.includes('Other') && (
+                                <div className={styles.form_group}>
+                                    <div className={styles.input_group}>
+                                        <input
+                                            type="text"
+                                            value={otherMedicalCondition}
+                                            onChange={(e) => setOtherMedicalCondition(e.target.value)}
+                                            className={styles.form_input}
+                                            placeholder="Enter other medical condition"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddOtherMedicalCondition}
+                                            className={styles.add_button}
+                                        >
+                                            Add
+                                        </button>
+                                        <small className={styles.form_helper}>
+                                            When you press the 'Add' button, your text will be added directly to database
+                                        </small>
+                                    </div>
+                                </div>
                             )}
 
                             <div className={styles.form_group}>
                                 <label className={styles.form_label}>Current Medications</label>
                                 <textarea
                                     name="medications"
-                                    value={formData.healthHistory.medications}
-                                    onChange={handleHealthHistoryChange}
+                                    value={formData.health_history.medications}
+                                    onChange={handleHealth_historyChange}
                                     className={styles.form_textarea}
-                                    placeholder="List any medications you are currently taking (if any)"
+                                    placeholder="List any medications you are currently taking (type 'None' if not take any)"
                                 />
+                            </div>
+
+                            <div className={styles.form_group}>
+                                <label className={styles.form_label}>Preferred Macro Ratio</label>
+                                <select
+                                    name="macro_ratio"
+                                    value={formData.macro_ratio}
+                                    onChange={handleInputChange}
+                                    className={styles.form_select}
+                                >
+                                    <option value="moderate_carb">Balanced (30% Protein / 35% Fats / 35% Carbs)</option>
+                                    <option value="lower_carb">Low Carb (40% Protein / 40% Fats / 20% Carbs)</option>
+                                    <option value="higher_carb">High Carb (30% Protein / 20% Fats / 50% Carbs)</option>
+                                </select>
+                                <small className={styles.form_helper}>
+                                    Choose your preferred macronutrient distribution.<br></br>
+                                    This will affect how your daily calories are divided between protein, fats, and carbohydrates.
+                                    <ul className={styles.macro_info}>
+                                        <li>Balanced: Good for general fitness and maintenance</li>
+                                        <li>Low Carb: May help with fat loss and blood sugar control</li>
+                                        <li>High Carb: Better for high-intensity activities and muscle gain</li>
+                                    </ul>
+                                </small>
                             </div>
                         </div>
                     )}
@@ -317,64 +410,38 @@ const HealthAssessment = () => {
                             <div className={styles.form_group}>
                                 <label className={styles.form_label}>Activity Level</label>
                                 <select
-                                    name="activityLevel"
-                                    value={formData.activityLevel}
+                                    name="activity_level"
+                                    value={formData.activity_level}
                                     onChange={handleInputChange}
                                     className={styles.form_select}
                                 >
                                     <option value="">Select activity level</option>
-                                    <option value="sedentary">Sedentary (Rarely Active)</option>
+                                    <option value="sedentary">Sedentary (Little to no exercise, desk job)</option>
                                     <option value="light">Light (1-2 workouts/week)</option>
                                     <option value="moderate">Moderate (3-4 workouts/week)</option>
                                     <option value="active">Active (5+ workouts/week)</option>
                                     <option value="very_active">Very Active (Athlete/Physical Worker)</option>
                                 </select>
+                                <small className={styles.form_helper}>
+                                    Select the level that best describes your daily physical activity including regular exercise
+                                </small>
                             </div>
 
                             <div className={styles.form_group}>
-                                <label className={styles.form_label}>Exercise Frequency</label>
+                                <label className={styles.form_label}>Health Goal</label>
                                 <select
-                                    name="exerciseFrequency"
-                                    value={formData.exerciseFrequency}
+                                    name="health_goal"
+                                    value={formData.health_goal}
                                     onChange={handleInputChange}
                                     className={styles.form_select}
                                 >
-                                    <option value="">Select exercise frequency</option>
-                                    <option value="never">Never</option>
-                                    <option value="rarely">Rarely (1-2 times/month)</option>
-                                    <option value="sometimes">Sometimes (1-2 times/week)</option>
-                                    <option value="often">Often (3-4 times/week)</option>
-                                    <option value="regular">Regular (5+ times/week)</option>
+                                    <option value="">Select goal</option>
+                                    <option value="fat_loss">Fat Loss</option>
+                                    <option value="muscle_gain">Muscle Building/Weight Gain</option>
+                                    <option value="health">General Health</option>
+                                    <option value="disesase">Disease Management</option>
+                                    <option value="energy">Increase Energy</option>
                                 </select>
-                            </div>
-
-                            <div className={styles.form_group}>
-                                <label className={styles.form_label}>Health Goals</label>
-                                <div className={styles.checkbox_group}>
-                                    {[
-                                        'Weight Loss',
-                                        'Weight Gain',
-                                        'Muscle Building',
-                                        'General Health',
-                                        'Increase Energy',
-                                        'Disease Management'
-                                    ].map(goal => (
-                                        <div key={goal} className={styles.checkbox_option}>
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.healthGoals.includes(goal)}
-                                                onChange={() => handleCheckboxChange('healthGoals', goal)}
-                                                id={`goal-${goal}`}
-                                            />
-                                            <label 
-                                                htmlFor={`goal-${goal}`}
-                                                className={styles.checkbox_label}
-                                            >
-                                                {goal}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
                             </div>
 
                             <div className={styles.form_group}>
@@ -382,8 +449,8 @@ const HealthAssessment = () => {
                                 <div className={styles.input_group}>
                                     <input
                                         type="number"
-                                        name="targetWeight"
-                                        value={formData.targetWeight}
+                                        name="target_weight"
+                                        value={formData.target_weight}
                                         onChange={handleInputChange}
                                         className={styles.form_input}
                                         placeholder="60"
@@ -397,8 +464,8 @@ const HealthAssessment = () => {
                             <div className={styles.form_group}>
                                 <label className={styles.form_label}>Specific Goals</label>
                                 <textarea
-                                    name="specificGoals"
-                                    value={formData.specificGoals}
+                                    name="specific_goals"
+                                    value={formData.specific_goals}
                                     onChange={handleInputChange}
                                     className={styles.form_textarea}
                                     placeholder="Write any specific goals you want to achieve"
