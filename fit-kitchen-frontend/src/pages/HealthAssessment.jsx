@@ -23,7 +23,7 @@ const HealthAssessment = () => {
         
         // Physical Activity & Goals
         activity_level: '',
-        health_goal: [],
+        health_goal: '',
         specific_goals: '',
         target_weight: ''
     };
