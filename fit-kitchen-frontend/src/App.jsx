@@ -10,6 +10,7 @@ import EditProfile from './pages/EditProfile.jsx';
 import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
+import Menu from './pages/Menu.jsx';
 import Profile from './pages/Profile.jsx';
 import Register from './pages/Register.jsx';
 
@@ -143,6 +144,17 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <ChangePassword />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/menu"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <Menu />
                                 </Layout>
                             </ProtectedRoute>
                         }
