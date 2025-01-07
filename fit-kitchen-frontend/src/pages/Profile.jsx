@@ -15,7 +15,6 @@ const Profile = () => {
         const fetchProfileData = async () => {
             try {
                 const session = sessionManager.getSession();
-                console.log('Fetching profile data, session:', session);
                 if (!session?.token) {
                     throw new Error('No authentication token found');
                 }
@@ -33,7 +32,6 @@ const Profile = () => {
                 }
         
                 const data = await response.json();
-                console.log('Profile data received:', data);
         
                 if (data.success) {
                     setProfileData(data.data);
@@ -68,7 +66,7 @@ const Profile = () => {
                 {/* Header Section */}
                 <div className="profile-header">
                     <h1 className="profile-title">Profile</h1>
-                    <Link to="/profile/edit" className="edit-button">
+                    <Link to="/profile/edit" className="green-button">
                         <Edit2 size={16} />
                         Edit Profile
                     </Link>
@@ -233,7 +231,7 @@ const Profile = () => {
                 ) : (
                     <div className="empty-state">
                         <p className="empty-message">You haven't completed your health assessment yet.</p>
-                        <Link to="/health-assessment" className="assessment-button">
+                        <Link to="/health-assessment" className="green-button">
                             <Activity size={16} />
                             Complete Health Assessment
                         </Link>

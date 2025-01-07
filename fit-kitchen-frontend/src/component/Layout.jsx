@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Layout.css';
 
@@ -8,11 +8,17 @@ export default function Layout({ children }) {
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const navigate = useNavigate();
 
     const navigation = [
         { name: 'Home', href: '/', current: location.pathname === '/' },
         { name: 'About', href: '/about', current: location.pathname === '/about' },
     ];
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    }
 
     return (
         <div className="layout">
@@ -53,7 +59,7 @@ export default function Layout({ children }) {
                                     </button>
                                     <div className={`dropdown-menu ${isDropdownOpen ? 'active' : ''}`}>
                                         <button
-                                            onClick={logout}
+                                            onClick={handleLogout}
                                             className="dropdown-item"
                                         >
                                             Sign out
@@ -97,7 +103,7 @@ export default function Layout({ children }) {
                             <div className="mobile-user-info">
                                 <div className="user-info-text">{currentUser.username}</div>
                                 <div className="user-info-email">{currentUser.email}</div>
-                                <button onClick={logout} className="mobile-logout">
+                                <button onClick={handleLogout} className="mobile-logout">
                                     Sign out
                                 </button>
                             </div>

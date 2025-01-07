@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Check, Eye, EyeOff, Lock, Mail, User, X } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,27 +10,22 @@ export default function Register() {
         username: '',
         email: '',
         password: '',
+        confirmPassword: ''
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { register } = useAuth();
 
-    const validatePassword = (password) => {
-        const requirements = {
-            length: password.length >= 6,
-            uppercase: /[A-Z]/.test(password),
-            lowercase: /[a-z]/.test(password),
-            number: /\d/.test(password),
-            special: /[@$!%*?&]/.test(password),
-        };
-
-        return {
-            isValid: Object.values(requirements).every(Boolean),
-            requirements
-        };
-    };
+    const passwordRequirements = [
+        { label: 'At least 6 characters', test: pwd => pwd.length >= 6 },
+        { label: 'One uppercase letter', test: pwd => /[A-Z]/.test(pwd) },
+        { label: 'One lowercase letter', test: pwd => /[a-z]/.test(pwd) },
+        { label: 'One number', test: pwd => /\d/.test(pwd) },
+        { label: 'One special character', test: pwd => /[@$!%*?&]/.test(pwd) }
+    ];
 
     const validateForm = () => {
         const newErrors = {};
@@ -52,22 +47,31 @@ export default function Register() {
         }
 
         // Password validation
-        const { isValid, requirements } = validatePassword(formData.password);
-        if (!isValid) {
-            newErrors.password = 'Password does not meet requirements';
-            newErrors.passwordRequirements = requirements;
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else {
+            const failedRequirements = passwordRequirements.filter(req => !req.test(formData.password));
+            if (failedRequirements.length > 0) {
+                newErrors.password = 'Password does not meet all requirements';
+            }
+        }
+
+        // Confirm Password validation
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = 'Please confirm your password';
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const getPasswordStrength = (password) => {
-        const { requirements } = validatePassword(password);
-        const validCount = Object.values(requirements).filter(Boolean).length;
-        
-        if (validCount <= 2) return 'weak';
-        if (validCount <= 4) return 'medium';
+    const getPasswordStrength = () => {
+        if (!formData.password) return '';
+        const passedRequirements = passwordRequirements.filter(req => req.test(formData.password));
+        if (passedRequirements.length <= 2) return 'weak';
+        if (passedRequirements.length <= 4) return 'medium';
         return 'strong';
     };
 
@@ -78,7 +82,6 @@ export default function Register() {
             [name]: value
         }));
         
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -112,8 +115,6 @@ export default function Register() {
     const handleGoogleSignIn = async () => {
         try {
             const origin = window.location.origin;
-            // const callbackUrl = `${origin}/auth/callback`;
-            
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
                 method: 'GET',
                 headers: {
@@ -138,136 +139,183 @@ export default function Register() {
 
     return (
         <div className="auth-page">
-            <div className="auth-box">
-                {loading && (
-                    <div className="loading-overlay">
-                        <div className="loading-spinner"></div>
-                    </div>
-                )}
-
-                <h2 className="auth-title">Create your account</h2>
-
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username" className="form-label">
-                            Username
-                        </label>
-                        <input
-                            id="username"
-                            name="username"
-                            type="text"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className={`form-input ${errors.username ? 'error' : ''}`}
-                            placeholder="Enter your username"
-                        />
-                        {errors.username && <div className="error-message">{errors.username}</div>}
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">
-                            Email address
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`form-input ${errors.email ? 'error' : ''}`}
-                            placeholder="you@example.com"
-                        />
-                        {errors.email && <div className="error-message">{errors.email}</div>}
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
-                        <div className="input-group">
-                            <input
-                                id="password"
-                                name="password"
-                                type={showPassword ? 'text' : 'password'}
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={`form-input ${errors.password ? 'error' : ''}`}
-                                placeholder="••••••••"
-                            />
-                            <div 
-                                className="input-icon"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </div>
+            <div className="auth-wrapper">
+                <div className="auth-card">
+                    {loading && (
+                        <div className="auth-loading-overlay">
+                            <div className="auth-loading-spinner" />
                         </div>
-                        
-                        {formData.password && (
-                            <div className="strength-indicator">
-                                <div className={`strength-bar strength-${getPasswordStrength(formData.password)}`} />
+                    )}
+    
+                    <h2 className="auth-title">Create your account</h2>
+    
+                    <form className="auth-form" onSubmit={handleSubmit}>
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <User size={16} />
+                                Username
+                            </label>
+                            <input
+                                type="text"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                className={`auth-field-input ${errors.username ? 'error' : ''}`}
+                                placeholder="Enter your username"
+                            />
+                            {errors.username && (
+                                <span className="auth-error-message">
+                                    <AlertCircle size={14} />
+                                    {errors.username}
+                                </span>
+                            )}
+                        </div>
+    
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <Mail size={16} />
+                                Email address
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className={`auth-field-input ${errors.email ? 'error' : ''}`}
+                                placeholder="you@example.com"
+                            />
+                            {errors.email && (
+                                <span className="auth-error-message">
+                                    <AlertCircle size={14} />
+                                    {errors.email}
+                                </span>
+                            )}
+                        </div>
+    
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <Lock size={16} />
+                                Password
+                            </label>
+                            <div className="auth-input-group">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className={`auth-field-input ${errors.password ? 'error' : ''}`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="auth-input-icon"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                            
+                            {formData.password && (
+                                <div className="auth-strength-indicator">
+                                    <div className={`auth-strength-bar auth-strength-${getPasswordStrength()}`} />
+                                </div>
+                            )}
+    
+                            <ul className="auth-requirements-list">
+                                {passwordRequirements.map((req, index) => (
+                                    <li 
+                                        key={index}
+                                        className={`auth-requirement-item ${
+                                            !formData.password ? '' :
+                                            req.test(formData.password) ? 'auth-requirement-valid' : 'auth-requirement-invalid'
+                                        }`}
+                                    >
+                                        {formData.password ? (
+                                            req.test(formData.password) ? <Check size={12} /> : <X size={12} />
+                                        ) : <div style={{ width: 12 }} />}
+                                        {req.label}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+    
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <Lock size={16} />
+                                Confirm Password
+                            </label>
+                            <div className="auth-input-group">
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className={`auth-field-input ${errors.confirmPassword ? 'error' : ''}`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="auth-input-icon"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                            {errors.confirmPassword && (
+                                <span className="auth-error-message">
+                                    <AlertCircle size={14} />
+                                    {errors.confirmPassword}
+                                </span>
+                            )}
+                        </div>
+    
+                        {errors.submit && (
+                            <div className="auth-error-message">
+                                <AlertCircle size={14} />
+                                {errors.submit}
                             </div>
                         )}
-
-                        <ul className="requirements-list">
-                            <li className={`requirement-item ${formData.password.length >= 6 ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
-                                At least 6 characters
-                            </li>
-                            <li className={`requirement-item ${/[A-Z]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
-                                One uppercase letter
-                            </li>
-                            <li className={`requirement-item ${/[a-z]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
-                                One lowercase letter
-                            </li>
-                            <li className={`requirement-item ${/\d/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
-                                One number
-                            </li>
-                            <li className={`requirement-item ${/[@$!%*?&]/.test(formData.password) ? 'valid' : formData.password.length > 0 ? 'invalid' : ''}`}>
-                                One special character (@$!%*?&)
-                            </li>
-                        </ul>
+    
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="auth-submit-button"
+                        >
+                            {loading ? 'Creating account...' : 'Create account'}
+                        </button>
+                    </form>
+    
+                    <div className="auth-separator">
+                        <div className="auth-separator-line" />
+                        <span className="auth-separator-text">Or continue with</span>
+                        <div className="auth-separator-line" />
                     </div>
-
-                    {errors.submit && <div className="error-message">{errors.submit}</div>}
-
+    
                     <button
-                        type="submit"
-                        disabled={loading}
-                        className="submit-button"
+                        onClick={handleGoogleSignIn}
+                        className="auth-social-button"
                     >
-                        {loading ? 'Creating account...' : 'Create account'}
+                        <img src="/google.svg" alt="Google" className="auth-social-icon" />
+                        Sign up with Google
                     </button>
-                </form>
-
-                <div className="separator">
-                    <div className="separator-line"></div>
-                    <span className="separator-text">Or continue with</span>
-                    <div className="separator-line"></div>
-                </div>
-
-                <button
-                    onClick={handleGoogleSignIn}
-                    className="social-button"
-                >
-                    <img src="/google.svg" alt="Google" className="social-icon" />
-                    Sign up with Google
-                </button>
-
-                <p className="terms-text">
-                    By signing up, you agree to our{' '}
-                    <Link to="/terms" className="terms-link">Terms of Service</Link>
-                    {' '}and{' '}
-                    <Link to="/privacy" className="terms-link">Privacy Policy</Link>
-                </p>
-
-                <div className="auth-link-container">
-                    <span className="auth-link-text">
-                        Already have an account?
-                    </span>
-                    <Link to="/login" className="auth-link">
-                        Sign in here
-                    </Link>
+    
+                    <p className="auth-terms">
+                        By signing up, you agree to our{' '}
+                        <Link to="/terms" className="auth-terms-link">Terms of Service</Link>
+                        {' '}and{' '}
+                        <Link to="/privacy" className="auth-terms-link">Privacy Policy</Link>
+                    </p>
+    
+                    <div className="auth-link-container">
+                        <span className="auth-link-text">
+                            Already have an account?
+                        </span>
+                        <Link to="/login" className="auth-link">
+                            Sign in here
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
     );
-}
+};

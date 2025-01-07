@@ -1,3 +1,4 @@
+import { AlertCircle, Eye, EyeOff, LogIn, Mail } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
 
     const validateForm = () => {
         const newErrors = {};
@@ -37,7 +39,6 @@ export default function Login() {
             ...prev,
             [name]: value
         }));
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -71,8 +72,6 @@ export default function Login() {
     const handleGoogleSignIn = async () => {
         try {
             const origin = window.location.origin;
-            // const callbackUrl = `${origin}/auth/callback`;
-            
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
                 method: 'GET',
                 headers: {
@@ -97,80 +96,106 @@ export default function Login() {
 
     return (
         <div className="auth-page">
-            <div className="auth-box">
-                {loading && (
-                    <div className="loading-overlay">
-                        <div className="loading-spinner"></div>
+            <div className="auth-wrapper">
+                <div className="auth-card">
+                    {loading && (
+                        <div className="auth-loading-overlay">
+                            <div className="auth-loading-spinner" />
+                        </div>
+                    )}
+
+                    <h2 className="auth-title">Welcome Back</h2>
+
+                    <form className="auth-form" onSubmit={handleSubmit}>
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <Mail size={16} />
+                                Email address
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className={`auth-field-input ${errors.email ? 'error' : ''}`}
+                                placeholder="you@example.com"
+                            />
+                            {errors.email && (
+                                <span className="auth-error-message">
+                                    <AlertCircle size={14} />
+                                    {errors.email}
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="auth-field-group">
+                            <label className="auth-field-label">
+                                <LogIn size={16} />
+                                Password
+                            </label>
+                            <div className="auth-input-group">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className={`auth-field-input ${errors.password ? 'error' : ''}`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="auth-input-icon"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <span className="auth-error-message">
+                                    <AlertCircle size={14} />
+                                    {errors.password}
+                                </span>
+                            )}
+                        </div>
+
+                        {errors.submit && (
+                            <div className="auth-error-message">
+                                <AlertCircle size={14} />
+                                {errors.submit}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="auth-submit-button"
+                        >
+                            {loading ? 'Signing in...' : 'Sign in'}
+                        </button>
+                    </form>
+
+                    <div className="auth-separator">
+                        <div className="auth-separator-line" />
+                        <span className="auth-separator-text">Or continue with</span>
+                        <div className="auth-separator-line" />
                     </div>
-                )}
-
-                <h2 className="auth-title">Sign in to your account</h2>
-
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">
-                            Email address
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`form-input ${errors.email ? 'error' : ''}`}
-                            placeholder="you@example.com"
-                        />
-                        {errors.email && <div className="error-message">{errors.email}</div>}
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className={`form-input ${errors.password ? 'error' : ''}`}
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <div className="error-message">{errors.password}</div>}
-                    </div>
-
-                    {errors.submit && <div className="error-message">{errors.submit}</div>}
 
                     <button
-                        type="submit"
-                        disabled={loading}
-                        className="submit-button"
+                        onClick={handleGoogleSignIn}
+                        className="auth-social-button"
                     >
-                        {loading ? 'Signing in...' : 'Sign in'}
+                        <img src="/google.svg" alt="Google" className="auth-social-icon" />
+                        Sign in with Google
                     </button>
-                </form>
 
-                <div className="separator">
-                    <div className="separator-line"></div>
-                    <span className="separator-text">Or continue with</span>
-                    <div className="separator-line"></div>
-                </div>
-
-                <button
-                    onClick={handleGoogleSignIn}
-                    className="social-button"
-                >
-                    <img src="/../../../google.svg" alt="Google" className="social-icon" />
-                    Sign in with Google
-                </button>
-
-                <div className="auth-link-container">
-                    <span className="auth-link-text">
-                        Don't have an account?
-                    </span>
-                    <Link to="/register" className="auth-link">
-                        Register here
-                    </Link>
+                    <div className="auth-link-container">
+                        <span className="auth-link-text">
+                            Don't have an account?
+                        </span>
+                        <Link to="/register" className="auth-link">
+                            Register here
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

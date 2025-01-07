@@ -25,23 +25,6 @@
     margin: 0;
 }
 
-.edit-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #22c55e;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.2s;
-}
-
-.edit-button:hover {
-    background-color: #16a34a;
-}
-
 .section {
     padding-bottom: 24px;
     margin-bottom: 24px;
@@ -166,11 +149,11 @@
     margin-bottom: 16px;
 }
 
-.assessment-button {
+.green-button {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background-color: #22c55e;
+    background-color: #10b948;
     color: white;
     padding: 8px 16px;
     border-radius: 6px;
@@ -179,8 +162,9 @@
     transition: background-color 0.2s;
 }
 
-.assessment-button:hover {
-    background-color: #16a34a;
+.green-button:hover {
+    background-color: #7cff80;
+    color: #179a47;
 }
 
 .loading {
@@ -224,7 +208,7 @@
         gap: 16px;
     }
 
-    .edit-button {
+    .green-button {
         width: 100%;
         justify-content: center;
     }

@@ -4,7 +4,9 @@ import AuthCallback from './component/AuthCallback.jsx';
 import Layout from './component/Layout.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import About from './pages/About.jsx';
+import ChangePassword from './pages/ChangePassword.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
+import EditProfile from './pages/EditProfile.jsx';
 import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
@@ -119,6 +121,28 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <Profile />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/profile/edit"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <EditProfile />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/profile/change-password"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <ChangePassword />
                                 </Layout>
                             </ProtectedRoute>
                         }

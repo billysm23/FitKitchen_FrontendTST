@@ -34,12 +34,12 @@ export default function Home() {
                 <div className="icon-wrapper icon-blue">
                   <ClipboardList />
                 </div>
-                <h4 className="feature-title">Complete Your Profile</h4>
+                <h4 className="feature-title">Your Profile</h4>
                 <p className="feature-description">
-                  Add your health information and dietary preferences.
+                  View or change your credentials, health information, and dietary preferences.
                 </p>
                 <Link to="/profile" className="feature-button button-blue">
-                  Update Profile
+                  Go to Profile
                 </Link>
               </div>
 
