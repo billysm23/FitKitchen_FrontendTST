@@ -10,7 +10,7 @@ import EditProfile from './pages/EditProfile.jsx';
 import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
-import Menu from './pages/Menu.jsx';
+import MealPlans from './pages/MealPlans.jsx';
 import Profile from './pages/Profile.jsx';
 import Register from './pages/Register.jsx';
 
@@ -150,11 +150,11 @@ function App() {
                     />
 
                     <Route
-                        path="/menu"
+                        path="/meal-plan"
                         element={
                             <ProtectedRoute>
                                 <Layout>
-                                    <Menu />
+                                    <MealPlans />
                                 </Layout>
                             </ProtectedRoute>
                         }

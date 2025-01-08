@@ -60,12 +60,12 @@ export default function Home() {
                 <div className="icon-wrapper icon-purple">
                   <ChefHat />
                 </div>
-                <h4 className="feature-title">Browse Menu</h4>
+                <h4 className="feature-title">Select Meal Plan and Menus</h4>
                 <p className="feature-description">
                   Explore our curated selection of healthy and delicious meals.
                 </p>
-                <Link to="/menu" className="feature-button button-purple">
-                  View Menu
+                <Link to="/meal-plan" className="feature-button button-purple">
+                  View Meal Plan
                 </Link>
               </div>
 
