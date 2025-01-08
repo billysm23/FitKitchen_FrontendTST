@@ -1,92 +1,41 @@
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
+import MenuProgressIndicator from '../component/MenuProgressIndicator';
 import '../styles/MenuSelection.css';
 
-const MEALS_PER_PLAN = {
-    single: 1,
-    half_day: 2,
-    full_day: 4
-};
-
 const MenuSelection = () => {
-    const { planId } = useParams();
+    const { plan_type } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
     const [selectedMenus, setSelectedMenus] = useState([]);
-    const [availableMenus, setAvailableMenus] = useState([]);
-    const [healthProfile, setHealthProfile] = useState(null);
+    const [recommendations, setRecommendations] = useState([]);
+    const [planDetails, setPlanDetails] = useState(null);
+    const [targetNutrition, setTargetNutrition] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [validating, setValidating] = useState(false);
     const [step, setStep] = useState(1);
     const [error, setError] = useState(null);
+    const [selectionScore, setSelectionScore] = useState(0);
 
     useEffect(() => {
-        fetchHealthProfile();
-    }, []);
-
-    useEffect(() => {
-        if (healthProfile) {
-            fetchAvailableMenus();
+        if (!location.state?.recommendations || !location.state?.planDetails || !plan_type) {
+            toast.error('Please select a meal plan first');
+            navigate('/meal-plan');
+            return;
         }
-    }, [healthProfile]);
 
-    const fetchHealthProfile = async () => {
-        try {
-            const response = await api.get('/api/profile');
-            if (response.success && response.data.healthAssessment) {
-                setHealthProfile(response.data.healthAssessment);
-            } else {
-                navigate('/health-assessment');
-            }
-        } catch (error) {
-            console.error('Error fetching health profile:', error);
-            setError('Failed to load health profile');
-        }
-    };
-
-    const fetchAvailableMenus = async () => {
-        try {
-            // Calculate calories per meal based on plan type
-            let targetCalories;
-            const dailyCalories = healthProfile.metrics.final_cal;
-
-            switch (planId) {
-                case 'single':
-                    targetCalories = dailyCalories * 0.3;
-                    break;
-                case 'half_day':
-                    targetCalories = (dailyCalories * 0.5) / 2;
-                    break;
-                case 'full_day':
-                    targetCalories = dailyCalories / 4;
-                    break;
-                default:
-                    throw new Error('Invalid plan type');
-            }
-
-            const response = await api.get('/api/menus/recommended', {
-                params: {
-                    meal_plan_type: planId,
-                    target_calories: targetCalories,
-                    allergies: healthProfile.health_history.allergies.join(',')
-                }
-            });
-
-            if (response.success) {
-                setAvailableMenus(response.data);
-            } else {
-                throw new Error('Failed to fetch menus');
-            }
-        } catch (error) {
-            console.error('Error fetching menus:', error);
-            setError('Failed to load available menus');
-        } finally {
-            setLoading(false);
-        }
-    };
+        const { recommendations, planDetails, targetNutrition } = location.state;
+        setRecommendations(recommendations);
+        setPlanDetails(planDetails);
+        setTargetNutrition(targetNutrition);
+        setLoading(false);
+    }, [location.state, plan_type, navigate]);
 
     const handleMenuSelect = (menu) => {
-        const maxSelections = MEALS_PER_PLAN[planId];
+        const maxSelections = planDetails?.maxMenus || 1;
         
         setSelectedMenus(prev => {
             const isSelected = prev.some(m => m.id === menu.id);
@@ -101,24 +50,50 @@ const MenuSelection = () => {
         });
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step === 1) {
-            if (selectedMenus.length === MEALS_PER_PLAN[planId]) {
-                setStep(2);
+            if (selectedMenus.length < (planDetails?.minMenus || 1)) {
+                toast.error(`Please select at least ${planDetails.minMenus} menu${planDetails.minMenus > 1 ? 's' : ''}`);
+                return;
+            }
+
+            try {
+                const response = await api.post('/api/menu/validate-selection', {
+                    menuIds: selectedMenus.map(menu => menu.id),
+                    plan_type
+                });
+
+                if (response.success && response.data.isValid) {
+                    setStep(2);
+                } else {
+                    toast.error(response.data?.validationDetails?.message || 'Invalid menu selection');
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                toast.error('Failed to validate menu selection');
             }
         } else {
-            navigate('/checkout', { 
-                state: { 
-                    selectedMenus,
-                    planType: planId 
-                } 
-            });
+            // Create meal plan
+            try {
+                const response = await api.post('/api/meal-plan/create', {
+                    plan_type,
+                    menuIds: selectedMenus.map(menu => menu.id)
+                });
+
+                if (response.success) {
+                    toast.success('Meal plan created successfully');
+                    navigate('/');
+                }
+            } catch (error) {
+                console.error('Error creating meal plan:', error);
+                toast.error('Failed to create meal plan');
+            }
         }
     };
 
     const handleBack = () => {
         if (step === 1) {
-            navigate('/meal-plans');
+            navigate('/meal-plan');
         } else {
             setStep(1);
         }
@@ -140,6 +115,41 @@ const MenuSelection = () => {
         );
     }
 
+    const renderNutritionInfo = (menu) => {
+        const targetCalories = planDetails?.maxTotalCalories / planDetails?.maxMenus;
+        const calorieDeviation = Math.abs(menu.calories_per_serving - targetCalories) / targetCalories;
+        const isCaloriesGood = calorieDeviation <= 0.2; // 20% tolerance
+
+        return (
+            <div className="menu-macros">
+                <div className={`macro-item ${!isCaloriesGood ? 'warning' : ''}`}>
+                    <span className="macro-value">
+                        {menu.calories_per_serving}
+                    </span>
+                    <span className="macro-label">calories</span>
+                </div>
+                <div className="macro-item">
+                    <span className="macro-value">
+                        {menu.protein_per_serving}g
+                    </span>
+                    <span className="macro-label">protein</span>
+                </div>
+                <div className="macro-item">
+                    <span className="macro-value">
+                        {menu.carbs_per_serving}g
+                    </span>
+                    <span className="macro-label">carbs</span>
+                </div>
+                <div className="macro-item">
+                    <span className="macro-value">
+                        {menu.fats_per_serving}g
+                    </span>
+                    <span className="macro-label">fats</span>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="menu-selection-container">
             <div className="menu-selection-header">
@@ -148,10 +158,17 @@ const MenuSelection = () => {
                 </h1>
                 <p className="menu-selection-subtitle">
                     {step === 1 
-                        ? `Choose ${MEALS_PER_PLAN[planId]} meals for your plan` 
+                        ? `Choose ${planDetails?.minMenus} to ${planDetails?.maxMenus} meals for your plan` 
                         : 'Review your meals and proceed to checkout'}
                 </p>
             </div>
+                
+            <MenuProgressIndicator
+                selectedMenus={selectedMenus}
+                planDetails={planDetails}
+                targetNutrition={targetNutrition}
+                onScoreChange={setSelectionScore}
+            />
 
             <div className="selection-steps">
                 <div className={`step ${step >= 1 ? 'active' : ''}`}>
@@ -169,86 +186,61 @@ const MenuSelection = () => {
             </div>
 
             <div className="menu-grid">
-            {(step === 1 ? availableMenus : selectedMenus).map(menu => (
-                <div 
-                    key={menu.id}
-                    className={`menu-card ${
-                        selectedMenus.some(m => m.id === menu.id) ? 'selected' : ''
-                    }`}
-                    onClick={() => step === 1 && handleMenuSelect(menu)}
-                >
-                    {menu.image_url ? (
-                        <img 
-                            src={menu.image_url} 
-                            alt={menu.name}
-                            className="menu-image"
-                        />
-                    ) : (
-                        <div className="menu-image" />
-                    )}
-
-                    <div className="menu-content">
-                        <h3 className="menu-name">{menu.name}</h3>
-                        <p className="menu-description">{menu.description}</p>
-
-                        <div className="menu-macros">
-                            <div className="macro-item">
-                                <span className="macro-value">
-                                    {menu.calories_per_serving}
-                                </span>
-                                <span className="macro-label">calories</span>
-                            </div>
-                            <div className="macro-item">
-                                <span className="macro-value">
-                                    {menu.protein_per_serving}g
-                                </span>
-                                <span className="macro-label">protein</span>
-                            </div>
-                            <div className="macro-item">
-                                <span className="macro-value">
-                                    {menu.carbs_per_serving}g
-                                </span>
-                                <span className="macro-label">carbs</span>
-                            </div>
-                            <div className="macro-item">
-                                <span className="macro-value">
-                                    {menu.fats_per_serving}g
-                                </span>
-                                <span className="macro-label">fats</span>
-                            </div>
-                        </div>
-
-                        {selectedMenus.some(m => m.id === menu.id) && (
-                            <div className="selected-indicator">
-                                <Check className="check-icon" />
-                            </div>
+                {(step === 1 ? recommendations : selectedMenus).map(menu => (
+                    <div 
+                        key={menu.id}
+                        className={`menu-card ${
+                            selectedMenus.some(m => m.id === menu.id) ? 'selected' : ''
+                        }`}
+                        onClick={() => step === 1 && handleMenuSelect(menu)}
+                    >
+                        {menu.image_url ? (
+                            <img 
+                                src={menu.image_url} 
+                                alt={menu.name}
+                                className="menu-image"
+                            />
+                        ) : (
+                            <div className="menu-image placeholder" />
                         )}
+
+                        <div className="menu-content">
+                            <h3 className="menu-name">{menu.name}</h3>
+                            <p className="menu-description">{menu.description}</p>
+
+                            {renderNutritionInfo(menu)}
+
+                            {selectedMenus.some(m => m.id === menu.id) && (
+                                <div className="selected-indicator">
+                                    <Check className="check-icon" />
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
             </div>
 
             <div className="menu-selection-footer">
-                {/* <RecipeGenerator /> */}
                 <button 
                     onClick={handleBack}
                     className="navigation-button back"
+                    disabled={validating}
                 >
-                    <ChevronLeft className="button-icon" />
+                    <ChevronLeft className="button-icon back" />
                     Back
                 </button>
 
                 <button
                     onClick={handleNext}
-                    disabled={selectedMenus.length !== MEALS_PER_PLAN[planId]}
+                    disabled={validating || selectedMenus.length < (planDetails?.minMenus || 1)}
                     className="navigation-button next"
                 >
-                    {step === 1 ? 'Review Selection' : 'Proceed to Checkout'}
-                    <ChevronRight className="button-icon" />
+                    {validating ? 'Processing...' : step === 1 ? 'Review Selection' : 'Create Plan'}
+                    <ChevronRight className="button-icon next" />
                 </button>
             </div>
         </div>
     );
-}
+};
 
 export default MenuSelection;

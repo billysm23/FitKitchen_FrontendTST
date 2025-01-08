@@ -175,10 +175,23 @@
     transition: all 0.2s;
 }
 
+.button-icon {
+    position: absolute;
+}
+
+.button-icon.back {
+    left: 8px;
+}
+
+.button-icon.next {
+    right: 8px;
+}
+
 .navigation-button.back {
     background: white;
     border: 1px solid #d1d5db;
     color: #6b7280;
+    padding-left: 35px;
 }
 
 .navigation-button.back:hover {
@@ -189,6 +202,7 @@
     background: #22c55e;
     border: none;
     color: white;
+    padding-right: 35px;
 }
 
 .navigation-button.next:hover {
@@ -200,7 +214,6 @@
     cursor: not-allowed;
 }
 
-/* Responsive Design */
 @media screen and (max-width: 768px) {
     .menu-selection-container {
         padding: 24px 16px;
