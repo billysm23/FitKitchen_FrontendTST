@@ -115,6 +115,13 @@ const MenuSelection = () => {
         );
     }
 
+    const totalNutrition = selectedMenus.reduce((acc, menu) => ({
+        calories: acc.calories + menu.calories_per_serving,
+        protein: acc.protein + menu.protein_per_serving,
+        carbs: acc.carbs + menu.carbs_per_serving,
+        fats: acc.fats + menu.fats_per_serving
+    }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
     const renderNutritionInfo = (menu) => {
         const targetCalories = planDetails?.maxTotalCalories / planDetails?.maxMenus;
         const calorieDeviation = Math.abs(menu.calories_per_serving - targetCalories) / targetCalories;
@@ -169,6 +176,52 @@ const MenuSelection = () => {
                 targetNutrition={targetNutrition}
                 onScoreChange={setSelectionScore}
             />
+
+            <div className="nutrition-cards">
+                <div className="nutrition-card target-nutrition">
+                    <h3 className="nutrition-card-title">Target Nutrition</h3>
+                    <div className="nutrition-info">
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Calories:</span>
+                            <span className="nutrition-value">{targetNutrition?.planCalories || '-'}</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Protein:</span>
+                            <span className="nutrition-value">{targetNutrition?.macros.protein || '-'}g</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Carbs:</span>
+                            <span className="nutrition-value">{targetNutrition?.macros.carbs || '-'}g</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Fats:</span>
+                            <span className="nutrition-value">{targetNutrition?.macros.fats || '-'}g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="nutrition-card total-nutrition">
+                    <h3 className="nutrition-card-title">Total Nutrition</h3>
+                    <div className="nutrition-info">
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Calories:</span>
+                            <span className="nutrition-value">{totalNutrition?.calories || '-'}</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Protein:</span>
+                            <span className="nutrition-value">{totalNutrition?.protein || '-'}g</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Carbs:</span>
+                            <span className="nutrition-value">{totalNutrition?.carbs || '-'}g</span>
+                        </div>
+                        <div className="nutrition-item">
+                            <span className="nutrition-label">Fats:</span>
+                            <span className="nutrition-value">{totalNutrition?.fats || '-'}g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="selection-steps">
                 <div className={`step ${step >= 1 ? 'active' : ''}`}>

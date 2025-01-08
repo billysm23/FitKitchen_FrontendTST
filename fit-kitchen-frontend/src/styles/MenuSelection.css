@@ -19,6 +19,60 @@
     color: #6b7280;
 }
 
+.nutrition-cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.nutrition-card {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.target-nutrition {
+    background-color: #f0fdf4;
+}
+
+.total-nutrition {
+    background-color: #fff7ed;
+}
+
+.nutrition-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.nutrition-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.nutrition-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nutrition-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.nutrition-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
 .selection-steps {
     display: flex;
     justify-content: space-between;
@@ -158,8 +212,8 @@
 .menu-selection-footer {
     position: sticky;
     bottom: 0;
-    background: white;
-    border-top: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    border-top: 1px solid #00ff80;
     padding: 16px 0;
     display: flex;
     justify-content: space-between;
