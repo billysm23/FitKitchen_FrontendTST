@@ -1,21 +1,21 @@
-import api from './axios.js';
+import axios from 'axios';
 
-const recipeApi = api.create({
-    baseURL: 'https://smart-health-tst.up.railway.app/api',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': process.env.REACT_APP_RECIPE_API_KEY
-    }
-});
-
-export const recipeService = {
-    async generateRecipes(ingredients) {
-        try {
-            const response = await recipeApi.post('/recipes', { ingredients });
-            return response.data.recipes;
-        } catch (error) {
-            console.error('Recipe generation error:', error);
-            throw new Error(error.response?.data?.message || 'Failed to generate recipes');
+export async function generateRecipes(ingredients) {
+  try {
+    const { data } = await axios.post(
+      'https://smart-health-tst.up.railway.app/api/recipes', 
+      { ingredients },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': process.env.REACT_APP_RECIPE_API_KEY
         }
-    }
-};
+      }
+    );
+
+    return data.recipes;
+  } catch (error) {
+    console.error('Recipe Generation Error:', error);
+    return [];
+  }
+}

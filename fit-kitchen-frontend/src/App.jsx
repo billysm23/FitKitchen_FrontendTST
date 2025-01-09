@@ -2,6 +2,7 @@ import { Toaster } from 'react-hot-toast';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AuthCallback from './component/AuthCallback.jsx';
 import Layout from './component/Layout.jsx';
+import RecipeGenerator from './component/RecipeGenerator.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import About from './pages/About.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
@@ -179,6 +180,17 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <OrderHistory />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    
+                    <Route
+                        path="/recipe-generator"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <RecipeGenerator />
                                 </Layout>
                             </ProtectedRoute>
                         }

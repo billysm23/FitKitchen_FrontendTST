@@ -1,10 +1,75 @@
-import { Activity, ChefHat, ClipboardList, ShoppingBag } from 'lucide-react';
+import { Activity, ChefHat, ClipboardList, Flame, ShoppingBag, Target, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Home.css';
 
 export default function Home() {
   const { currentUser } = useAuth();
+  const [healthProfile, setHealthProfile] = useState(null);
+  const [activePlans, setActivePlans] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Fetch health profile
+        const profileResponse = await api.get('/api/profile');
+        if (profileResponse.success) {
+          setHealthProfile(profileResponse.data.healthAssessment);
+        }
+
+        // Fetch active meal plans
+        const plansResponse = await api.get('/api/meal-plan/active');
+        if (plansResponse.success) {
+          setActivePlans(plansResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (currentUser) {
+      fetchUserData();
+    }
+  }, [currentUser]);
+
+  const calculateGoalProgress = () => {
+    if (!healthProfile) return 0;
+
+    const { health_goal, target_weight, weight } = healthProfile;
+    
+    // If no target weight is set, return 0
+    if (!target_weight || !weight) return 0;
+
+    // Calculate progress based on goal type
+    switch (health_goal) {
+      case 'weight_loss':
+        const weightToLose = weight - target_weight;
+        const currentLoss = weight - healthProfile.weight;
+        return Math.round((currentLoss / weightToLose) * 100);
+      
+      case 'muscle_gain':
+        const weightToGain = target_weight - weight;
+        const currentGain = healthProfile.weight - weight;
+        return Math.round((currentGain / weightToGain) * 100);
+      
+      default:
+        return 0;
+    }
+  };
+
+  const calculateRemainingDays = () => {
+    if (!healthProfile?.target_weight) return 0;
+    
+    // Assuming a healthy rate of 0.5-1kg per week
+    const weightDifference = Math.abs(healthProfile.weight - healthProfile.target_weight);
+    const estimatedWeeks = weightDifference / 0.5;
+    return Math.round(estimatedWeeks * 7);
+  };
 
   return (
     <div className="home-container">
@@ -83,23 +148,51 @@ export default function Home() {
               </div>
             </div>
           </div>
-
+          
           <div className="quick-stats">
-            <h3 className="section-title">Quick Stats</h3>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-label">Active Meal Plan</div>
-                <div className="stat-value">Standard Plan</div>
+              <h3 className="section-title">Quick Stats</h3>
+              <div className="stats-grid">
+                  <div className="stat-card calories">
+                      <div className="stat-label">
+                          <Activity size={16} />
+                          Daily Calories
+                      </div>
+                      <div className="stat-value">
+                          {healthProfile?.metrics?.final_cal || 0} kcal
+                      </div>
+                      <div className="stat-meta">
+                          <TrendingUp className="trend-icon trend-up" size={14} />
+                          On track with your goal
+                      </div>
+                  </div>
+
+                  <div className="stat-card streak">
+                      <div className="stat-label">
+                          <Flame size={16} />
+                          Meal Plan Streak
+                      </div>
+                      <div className="stat-value">
+                          {activePlans?.length || 0} days
+                      </div>
+                      <div className="stat-meta">
+                          <TrendingUp className="trend-icon trend-up" size={14} />
+                          Keep it up!
+                      </div>
+                  </div>
+
+                  <div className="stat-card goals">
+                      <div className="stat-label">
+                          <Target size={16} />
+                          Goal Progress
+                      </div>
+                      <div className="stat-value">
+                          {calculateGoalProgress()}%
+                      </div>
+                      <div className="stat-meta">
+                          {calculateRemainingDays} days to goal
+                      </div>
+                  </div>
               </div>
-              <div className="stat-card">
-                <div className="stat-label">Next Delivery</div>
-                <div className="stat-value">Tomorrow, 10 AM</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Dietary Goals</div>
-                <div className="stat-value">2 of 3 Complete</div>
-              </div>
-            </div>
           </div>
         </div>
       ) : (

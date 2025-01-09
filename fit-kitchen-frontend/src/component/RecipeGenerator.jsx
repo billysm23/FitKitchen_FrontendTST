@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { recipeService } from '../api/recipeApi';
+import { generateRecipes } from '../api/recipeApi';
 import '../styles/RecipeGenerator.css';
 
 const RecipeGenerator = () => {
@@ -26,7 +26,7 @@ const RecipeGenerator = () => {
 
         setLoading(true);
         try {
-            const generatedRecipes = await recipeService.generateRecipes(ingredientList);
+            const generatedRecipes = await generateRecipes(ingredientList);
             setRecipes(generatedRecipes);
             if (generatedRecipes.length === 0) {
                 toast.info('No recipes found for these ingredients');
