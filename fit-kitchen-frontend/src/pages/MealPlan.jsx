@@ -12,7 +12,7 @@ const MealPlan = () => {
 
     useEffect(() => {
         fetchHealthProfile();
-    }, [fetchHealthProfile]);
+    }, []);
 
     const fetchHealthProfile = async () => {
         try {
