@@ -215,7 +215,7 @@ const HealthAssessment = () => {
             </div>
 
             <div className={styles.progress_bar}>
-                <div 
+                <div
                     className={styles.progress_fill}
                     style={{ width: `${(currentStep / 3) * 100}%` }}
                 />
@@ -497,7 +497,7 @@ const HealthAssessment = () => {
                                 type="submit"
                                 className={`${styles.button} ${styles.button_primary}`}
                             >
-                                Sumbit
+                                Submit
                             </button>
                         )}
                     </div>

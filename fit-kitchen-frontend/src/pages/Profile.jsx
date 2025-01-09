@@ -18,7 +18,7 @@ const Profile = () => {
                 if (!session?.token) {
                     throw new Error('No authentication token found');
                 }
-                console.log('backend', process.env.REACT_APP_API_URL);
+        
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/profile`, {
                     headers: {
                         'Authorization': `Bearer ${session.token}`,
