@@ -12,6 +12,7 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import MealPlan from './pages/MealPlan.jsx';
 import MenuSelection from './pages/MenuSelection.jsx';
+import OrderHistory from './pages/OrderHistory.jsx';
 import Profile from './pages/Profile.jsx';
 import Register from './pages/Register.jsx';
 
@@ -167,6 +168,17 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <MenuSelection />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    
+                    <Route
+                        path="/order-history"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <OrderHistory />
                                 </Layout>
                             </ProtectedRoute>
                         }

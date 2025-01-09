@@ -247,15 +247,17 @@ const MenuSelection = () => {
                         }`}
                         onClick={() => step === 1 && handleMenuSelect(menu)}
                     >
-                        {menu.image_url ? (
-                            <img 
-                                src={menu.image_url} 
-                                alt={menu.name}
-                                className="menu-image"
-                            />
-                        ) : (
-                            <div className="menu-image placeholder" />
-                        )}
+                        <div className="menu-image-container">
+                            {menu.image_url ? (
+                                <img 
+                                    src={menu.image_url} 
+                                    alt={menu.name}
+                                    className="menu-image"
+                                />
+                            ) : (
+                                <div className="menu-image placeholder" />
+                            )}
+                        </div>
 
                         <div className="menu-content">
                             <h3 className="menu-name">{menu.name}</h3>

@@ -75,9 +75,9 @@ export default function Home() {
                 </div>
                 <h4 className="feature-title">Order History</h4>
                 <p className="feature-description">
-                  View your past orders and reorder your favorite meals.
+                  View your present and past orders, you can reorder your favorite meals.
                 </p>
-                <Link to="/orders" className="feature-button button-orange">
+                <Link to="/order-history" className="feature-button button-orange">
                   View Orders
                 </Link>
               </div>
