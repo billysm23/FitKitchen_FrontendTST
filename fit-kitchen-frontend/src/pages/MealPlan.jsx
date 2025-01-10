@@ -58,7 +58,7 @@ const MealPlan = () => {
                 'Nutrition consultation'
             ],
             calorieRatio: 0.5,
-            maxMenus: 3,
+            maxMenus: 4,
             recommended: true
         },
         {
@@ -75,7 +75,7 @@ const MealPlan = () => {
                 'Nutrition consultation'
             ],
             calorieRatio: 0.9,
-            maxMenus: 5
+            maxMenus: 8
         }
     ];
 
