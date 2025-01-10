@@ -51,7 +51,7 @@ const MealPlan = () => {
             subtitle: 'Ideal for busy professionals',
             basePrice: 45000,
             features: [
-                '2-3 meals per day',
+                '2-4 meals per day',
                 'Personalized portion sizes',
                 'Balanced nutrition',
                 'Fresh ingredients',
@@ -67,7 +67,7 @@ const MealPlan = () => {
             subtitle: 'Complete daily nutrition',
             basePrice: 40000,
             features: [
-                '3-5 meals per day',
+                '4-8 meals per day',
                 'Personalized portion sizes',
                 'Balanced nutrition',
                 'Fresh ingredients',
