@@ -5,6 +5,7 @@ import Layout from './component/Layout.jsx';
 import RecipeGenerator from './component/RecipeGenerator.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import About from './pages/About.jsx';
+import APIDocs from './pages/APIDocs.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 import EditProfile from './pages/EditProfile.jsx';
@@ -90,11 +91,34 @@ function App() {
                             </PublicRoute>
                         }
                     />
+                    
                     <Route
                         path="/register"
                         element={
                             <PublicRoute>
                                 <Register />
+                            </PublicRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/api-docs"
+                        element={
+                            <PublicRoute>
+                                <Layout>
+                                    <APIDocs />
+                                </Layout>
+                            </PublicRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/menu"
+                        element={
+                            <PublicRoute>
+                                <Layout>
+                                    <Menu />
+                                </Layout>
                             </PublicRoute>
                         }
                     />
@@ -159,17 +183,6 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <MealPlan />
-                                </Layout>
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route
-                        path="/menu"
-                        element={
-                            <ProtectedRoute>
-                                <Layout>
-                                    <Menu />
                                 </Layout>
                             </ProtectedRoute>
                         }

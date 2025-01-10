@@ -14,6 +14,7 @@ export default function Layout({ children }) {
         { name: 'Home', href: '/', current: location.pathname === '/' },
         { name: 'Menu', href: '/menu', current: location.pathname === '/menu' },
         { name: 'About', href: '/about', current: location.pathname === '/about' },
+        { name: 'API Docs', href: '/api-docs', current: location.pathname === '/api-docs' }
     ];
 
     const handleLogout = async () => {

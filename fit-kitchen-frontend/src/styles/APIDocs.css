@@ -1,0 +1,283 @@
+.api-docs-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+.api-docs-header {
+    background-color: #0acc00;
+    color: white;
+    padding: 48px 32px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+}
+
+.api-docs-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.api-docs-description {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.api-docs-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+@media (min-width: 1024px) {
+    .api-docs-content {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+.api-list {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+.api-list-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.api-section {
+    margin-bottom: 16px;
+}
+
+.api-section-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.api-section-header:hover {
+    background-color: #f3f4f6;
+}
+
+.api-section-title {
+    font-weight: 500;
+    margin-left: 8px;
+    color: #374151;
+}
+
+.api-endpoints {
+    margin-left: 24px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.api-endpoint-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.api-endpoint-button:hover {
+    background-color: #f3f4f6;
+}
+
+.api-endpoint-button.selected {
+    background-color: #e6f0ff;
+    color: #007808;
+}
+
+.endpoint-path {
+    font-family: monospace;
+    margin-left: 8px;
+    color: #007808;
+}
+
+.api-tester {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+.auth-token-group {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.auth-token-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.auth-required-badge {
+    background-color: #f87171;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.auth-token-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    color: #374151;
+}
+
+.auth-token-helper {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.api-tester-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1f2937;
+}
+
+.method-select-group {
+    margin-bottom: 24px;
+}
+
+.method-select {
+    color: #374151;
+}
+
+.method-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.method-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+}
+
+.request-body-group {
+    margin-bottom: 24px;
+}
+
+.request-body-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.request-body-textarea {
+    width: 800px;
+    height: 150px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 14px;
+    border: 1px solid #d1dbd4;
+    border-radius: 6px;
+    resize: vertical;
+    background-color: white;
+    color: #374151;
+}
+
+.send-button {
+    width: 100%;
+    background-color: #28c716;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.send-button:hover {
+    background-color: #00990d;
+}
+
+.response-section {
+    margin-top: 32px;
+}
+
+.response-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.response-preview {
+    width: 800px;
+    background-color: #f9fafb;
+    padding: 16px;
+    border-radius: 6px;
+}
+
+.response-code {
+    font-family: monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    color: #374151;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: slideDown 0.3s ease-out;
+}
