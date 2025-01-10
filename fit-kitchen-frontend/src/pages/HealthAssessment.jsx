@@ -445,7 +445,7 @@ const HealthAssessment = () => {
                             </div>
 
                             <div className={styles.form_group}>
-                                <label className={styles.form_label}>Target Weight (optional)</label>
+                                <label className={styles.form_label}>Target Weight</label>
                                 <div className={styles.input_group}>
                                     <input
                                         type="number"
@@ -462,7 +462,7 @@ const HealthAssessment = () => {
                             </div>
 
                             <div className={styles.form_group}>
-                                <label className={styles.form_label}>Specific Goals</label>
+                                <label className={styles.form_label}>Specific Goals (optional)</label>
                                 <textarea
                                     name="specific_goals"
                                     value={formData.specific_goals}
