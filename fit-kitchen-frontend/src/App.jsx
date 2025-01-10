@@ -104,22 +104,18 @@ function App() {
                     <Route
                         path="/api-docs"
                         element={
-                            <PublicRoute>
-                                <Layout>
-                                    <APIDocs />
-                                </Layout>
-                            </PublicRoute>
+                            <Layout>
+                                <APIDocs />
+                            </Layout>
                         }
                     />
 
                     <Route
                         path="/menu"
                         element={
-                            <PublicRoute>
-                                <Layout>
-                                    <Menu />
-                                </Layout>
-                            </PublicRoute>
+                            <Layout>
+                                <Menu />
+                            </Layout>
                         }
                     />
 
