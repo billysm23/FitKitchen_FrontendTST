@@ -12,6 +12,7 @@ import HealthAssessment from './pages/HealthAssessment.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import MealPlan from './pages/MealPlan.jsx';
+import Menu from './pages/Menu.jsx';
 import MenuSelection from './pages/MenuSelection.jsx';
 import OrderHistory from './pages/OrderHistory.jsx';
 import Profile from './pages/Profile.jsx';
@@ -158,6 +159,17 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <MealPlan />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/menu"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <Menu />
                                 </Layout>
                             </ProtectedRoute>
                         }

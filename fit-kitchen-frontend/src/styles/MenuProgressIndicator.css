@@ -50,3 +50,21 @@
     font-size: 0.875rem;
     color: #6b7280;
 }
+
+@media screen and (max-width: 768px) {
+    .menu-progress-container {
+        padding: 1rem;
+    }
+
+    .menu-progress-label {
+        font-size: 0.75rem;
+    }
+
+    .menu-progress-score {
+        font-size: 0.875rem;
+    }
+
+    .menu-progress-message {
+        font-size: 0.75rem;
+    }
+}

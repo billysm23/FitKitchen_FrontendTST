@@ -190,6 +190,11 @@ const MealPlan = () => {
                     );
                 })}
             </div>
+            <div className="browse-menu">
+                <a href="/menu" class="browse-menu-text">
+                    I want to browse menu before select plan
+                </a>
+            </div>
         </div>
     );
 };

@@ -276,6 +276,19 @@
         padding: 24px 16px;
     }
 
+    .menu-selection-title {
+        font-size: 24px;
+    }
+
+    .menu-selection-subtitle {
+        font-size: 14px;
+    }
+
+    .nutrition-cards {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
     .selection-steps {
         padding: 0;
         margin-bottom: 32px;
@@ -294,5 +307,51 @@
     .menu-grid {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+
+    .menu-image-container {
+        height: 200px;
+    }
+
+    .menu-image {
+        height: 200px;
+        width: 100%;
+    }
+
+    .menu-card {
+        height: auto;
+    }
+
+    .menu-content {
+        padding: 12px;
+    }
+
+    .menu-name {
+        font-size: 16px;
+    }
+
+    .menu-description {
+        font-size: 12px;
+    }
+
+    .menu-macros {
+        margin-bottom: 8px;
+    }
+
+    .macro-value {
+        font-size: 12px;
+    }
+
+    .macro-label {
+        font-size: 10px;
+    }
+
+    .menu-selection-footer {
+        padding: 12px 0;
+    }
+
+    .navigation-button {
+        padding: 8px 16px;
+        font-size: 14px;
     }
 }

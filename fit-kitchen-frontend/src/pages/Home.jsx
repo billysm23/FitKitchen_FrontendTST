@@ -140,7 +140,7 @@ export default function Home() {
                 </div>
                 <h4 className="feature-title">Order History</h4>
                 <p className="feature-description">
-                  View your present and past orders, you can reorder your favorite meals.
+                  View your present and past orders, you can mark it as completed or canceled.
                 </p>
                 <Link to="/order-history" className="feature-button button-orange">
                   View Orders

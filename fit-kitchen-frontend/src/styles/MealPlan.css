@@ -172,6 +172,22 @@
     color: #1f2937;
 }
 
+.browse-menu {
+    justify-content: center;
+    display: flex;
+    text-underline-offset: 0.25rem;
+}
+
+.browse-menu-text {
+    color: #22c55e;
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+.browse-menu-text:hover {
+    color: #16a34a;
+}
+
 .loading-spinner {
     width: 40px;
     height: 40px;
