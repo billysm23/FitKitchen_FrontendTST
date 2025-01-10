@@ -310,7 +310,7 @@ const HealthAssessment = () => {
                             {renderHealth_historyCheckboxGroup(
                                 'allergies',
                                 ['Dairy & Dairy Products','Eggs','Nuts','Seafood','Other'],
-                                'Food Allergies/Intolerances'
+                                'Food Allergies/Intolerance'
                             )}
 
                             {formData.health_history.allergies.includes('Other') && (
@@ -387,8 +387,8 @@ const HealthAssessment = () => {
                                     className={styles.form_select}
                                 >
                                     <option value="moderate_carb">Balanced</option>
-                                    <option value="lower_carb">Low Carb</option>
-                                    <option value="higher_carb">High Carb</option>
+                                    <option value="lower_carb">Low Carb/High Fat</option>
+                                    <option value="higher_carb">High Carb/Low Fat</option>
                                 </select>
                                 <small className={styles.form_helper}>
                                     Choose your preferred macronutrient distribution.<br></br>

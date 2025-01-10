@@ -136,7 +136,7 @@ const Profile = () => {
                                 <Book className="section-icon" />
                                 <h2 className="section-title">Health History</h2>
                             </div>
-                            <div className="health-history">
+                            <div className="info-grid">
                                 <div className="info-item">
                                     <p className="info-label">Allergies</p>
                                     <p className="info-value">
@@ -157,6 +157,24 @@ const Profile = () => {
                                     <p className="info-label">Medications</p>
                                     <p className="info-value">
                                         {profileData.healthAssessment.health_history.medications || 'None reported'}
+                                    </p>
+                                </div>
+                                <div className="info-item">
+                                    <p className="info-label">Preferred Macro Ratio</p>
+                                    <p className="info-value">
+                                        {(() => {
+                                            const macroRatio = profileData.healthAssessment.macro_ratio;
+                                            switch (macroRatio) {
+                                                case 'moderate_carb':
+                                                return 'Balanced';
+                                                case 'lower_carb':
+                                                return 'Low Carb/High Fat';
+                                                case 'higher_carb':
+                                                return 'High Carb/Low Fat';
+                                                default:
+                                                return 'None reported';
+                                            }
+                                        })()}
                                     </p>
                                 </div>
                             </div>

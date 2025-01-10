@@ -304,6 +304,20 @@ const EditProfile = () => {
                                 placeholder="List any medications you are currently taking"
                             />
                         </div>
+
+                        <div className="profile-edit-form-group">
+                            <label className="profile-edit-label">Macro Ratio</label>
+                            <select
+                                name="macroRatio"
+                                value={formData.macroRatio}
+                                onChange={handleChange}
+                                className="profile-edit-select"
+                            >
+                                <option value="moderate_carb">Balanced</option>
+                                <option value="lower_carb">Low Carb/High Fat</option>
+                                <option value="higher_carb">High Carb/Low Fat</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Activity & Goals Section */}
